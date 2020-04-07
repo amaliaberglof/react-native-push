@@ -1,6 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Button } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { MonoText } from '../components/StyledText';
@@ -13,17 +13,19 @@ export default function HomeScreen() {
           <Image
             source={
               __DEV__
-                ? require('../assets/images/robot-dev.png')
-                : require('../assets/images/robot-prod.png')
+                ? require('../assets/images/logo.png')
+                : require('../assets/images/logo.png')
             }
             style={styles.welcomeImage}
           />
+
         </View>
 
-        <View style={styles.getStartedContainer}>
-          <DevelopmentModeNotice />
+         <View style={styles.getStartedContainer}>
+          {/* <DevelopmentModeNotice /> */}
+          {/* ^ kanske ta tillbaka i framtiden, så man kan se om funkar i development mode/inte developmentmode */}
 
-          <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
+         {/* <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
 
           <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
             <MonoText>screens/HomeScreen.js</MonoText>
@@ -32,21 +34,39 @@ export default function HomeScreen() {
           <Text style={styles.getStartedText}>
             Change any of the , save the file, and your app will automatically reload.
           </Text>
-        </View>
+        </View> */}
 
-        <View style={styles.helpContainer}>
+        {/* <View style={styles.helpContainer}>
           <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
             <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-          </TouchableOpacity>
-        </View>
+          </TouchableOpacity>*/}
+           
+        </View> 
       </ScrollView>
 
       <View style={styles.tabBarInfoContainer}>
-        <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-        <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
+        {/* <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text> */}
+        {/* <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
           <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
-        </View>
+        </View> */}
+        <Text style={styles.tabBarInfoText}>Såhär funkar det:
+        <ul>
+          <li>Hitta närmsta systembolag</li>
+          <li>Skaka din telefon! Shake it! shake it!</li>
+          <li>A delicious beverage is recommended to you!</li>
+        </ul>
+        </Text> 
+        <Button
+        title="STARTA">
+        </Button>
+        <Image
+            source={
+              __DEV__
+                ? require('../assets/images/26711.jpg')
+                : require('../assets/images/26711.jpg')
+            }
+            style={styles.cheersImage}
+          />
       </View>
     </View>
   );
@@ -110,10 +130,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   welcomeImage: {
-    width: 100,
+    width: 400,
     height: 80,
     resizeMode: 'contain',
     marginTop: 3,
+    marginLeft: -10,
+  },
+  cheersImage: {
+    width: 900,
+    height: 200,
+    resizeMode: 'contain',
+    marginTop: 3,
+    marginBottom: 0,
     marginLeft: -10,
   },
   getStartedContainer: {
@@ -158,9 +186,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   tabBarInfoText: {
-    fontSize: 17,
+    fontSize: 18,
     color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   navigationFilename: {
     marginTop: 5,
