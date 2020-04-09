@@ -4,72 +4,88 @@ import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Button } fro
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { MonoText } from '../components/StyledText';
+import {getStoresInCity, getStoreInventory} from '../apiFunctions'
 
-export default function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.welcomeContainer}>
-          <Image
-            source={
-              __DEV__
-                ? require('../assets/images/logo.png')
-                : require('../assets/images/logo.png')
-            }
-            style={styles.welcomeImage}
-          />
+export default class HomeScreen extends React.Component {
+    constructor() {
+        super();
+        this.state = {stores: []};
+        this.getStores();
+    }
 
-        </View>
+    getStores(){
+        getStoresInCity('stockholm').then(data=> this.setState({stores: data.items}))
+    }
 
-         <View style={styles.getStartedContainer}>
-          {/* <DevelopmentModeNotice /> */}
-          {/* ^ kanske ta tillbaka i framtiden, så man kan se om funkar i development mode/inte developmentmode */}
+    render(){
+        let slice = this.state.stores.slice(0, 5);
 
-         {/* <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
+        return (
+            <View style={styles.container}>
+            <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+                <View style={styles.welcomeContainer}>
+                <Image
+                    source={
+                    __DEV__
+                        ? require('../assets/images/logo.png')
+                        : require('../assets/images/logo.png')
+                    }
+                    style={styles.welcomeImage}
+                />
 
-          <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-            <MonoText>screens/HomeScreen.js</MonoText>
-          </View>
+                </View>
 
-          <Text style={styles.getStartedText}>
-            Change any of the , save the file, and your app will automatically reload.
-          </Text>
-        </View> */}
+                <View style={styles.getStartedContainer}>
+                {/* <DevelopmentModeNotice /> */}
+                {/* ^ kanske ta tillbaka i framtiden, så man kan se om funkar i development mode/inte developmentmode */}
 
-        {/* <View style={styles.helpContainer}>
-          <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-            <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-          </TouchableOpacity>*/}
-           
-        </View> 
-      </ScrollView>
+                {/* <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
 
-      <View style={styles.tabBarInfoContainer}>
-        {/* <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text> */}
-        {/* <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-          <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
-        </View> */}
-        <Text style={styles.tabBarInfoText}>Såhär funkar det:
-        <ul>
-          <li>Hitta närmsta systembolag</li>
-          <li>Skaka din telefon! Shake it! shake it!</li>
-          <li>A delicious beverage is recommended to you!</li>
-        </ul>
-        </Text> 
-        <Button
-        title="STARTA">
-        </Button>
-        <Image
-            source={
-              __DEV__
-                ? require('../assets/images/26711.jpg')
-                : require('../assets/images/26711.jpg')
-            }
-            style={styles.cheersImage}
-          />
-      </View>
-    </View>
-  );
+                <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
+                    <MonoText>screens/HomeScreen.js</MonoText>
+                </View>
+
+                <Text style={styles.getStartedText}>
+                    Change any of the , save the file, and your app will automatically reload.
+                </Text>
+                </View> */}
+
+                {/* <View style={styles.helpContainer}>
+                <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
+                    <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
+                </TouchableOpacity>*/}
+                <h2>Here's some stores in Stockholm</h2>
+                {slice.map(store => <div>{store.address}</div>)}
+                </View> 
+            </ScrollView>
+
+            <View style={styles.tabBarInfoContainer}>
+                {/* <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text> */}
+                {/* <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
+                <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
+                </View> */}
+                <Text style={styles.tabBarInfoText}>Såhär funkar det:
+                <ul>
+                <li>Hitta närmsta systembolag</li>
+                <li>Skaka din telefon! Shake it! shake it!</li>
+                <li>A delicious beverage is recommended to you!</li>
+                </ul>
+                </Text> 
+                <Button
+                title="STARTA">
+                </Button>
+                <Image
+                    source={
+                    __DEV__
+                        ? require('../assets/images/26711.jpg')
+                        : require('../assets/images/26711.jpg')
+                    }
+                    style={styles.cheersImage}
+                />
+            </View>
+            </View>
+        )
+    }
 }
 
 HomeScreen.navigationOptions = {
