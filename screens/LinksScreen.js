@@ -1,8 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
+import { Input } from 'react-native-elements';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+
+const config = {
+  apiKey: "AIzaSyAof_5Wo36Wn2B4vdT6ncqdOBeZRdFGsmE",
+  authDomain: "findthedrink.firebaseapp.com",
+  databaseURL: "https://findthedrink.firebaseio.com",
+  projectId: "findthedrink",
+  storageBucket: "findthedrink.appspot.com",
+  messagingSenderId: "504646558883",
+  appId: "1:504646558883:web:7426365e9266368d654b16",
+  measurementId: "G-FCM6BTPP6X"
+};
+
+firebase.initializeApp(config);
 
 export default function LinksScreen() {
   return (
@@ -24,6 +40,29 @@ export default function LinksScreen() {
         label="Ask a question on the forums"
         onPress={() => WebBrowser.openBrowserAsync('https://forums.expo.io')}
         isLastOption
+      />
+      <Input 
+        id="email"
+        placeholder="email"/>
+      <Input
+        id="password"
+        secureTextEntry={true}
+        placeholder="Password"/>
+      <Button 
+        title="Login"
+        onPress={() => console.log("Hej")}
+      />
+      <Button 
+        title="Sign in"
+        onPress={() => {
+          const email = document.getElementById("email").value
+          const password = document.getElementById("password").value
+          const auth = firebase.auth();
+          const promise = auth.createUserWithEmailAndPassword(email,password)
+          promise
+            .then(() => console.log("Yaaay"))
+            .catch(e => console.log(e.message))
+        }}
       />
     </ScrollView>
   );
