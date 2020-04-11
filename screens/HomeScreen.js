@@ -4,17 +4,23 @@ import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Button } fro
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { MonoText } from '../components/StyledText';
-import {getStoresInCity, getStoreInventory} from '../apiFunctions'
+import {getStoresInCity, getStoreInventory, getClosestStore} from '../apiFunctions'
 
 export default class HomeScreen extends React.Component {
     constructor() {
         super();
-        this.state = {stores: []};
+        this.state = {
+            stores: [],
+            closestStore: ""};
         this.getStores();
+        this.getStore();
     }
 
     getStores(){
         getStoresInCity('stockholm').then(data=> this.setState({stores: data.items}))
+    }
+    getStore(){
+        getClosestStore(57.709111, 11.960399).then(data=> this.setState({closestStore: data.items[0]. address}))
     }
 
     render(){
@@ -36,26 +42,29 @@ export default class HomeScreen extends React.Component {
                 </View>
 
                 <View style={styles.getStartedContainer}>
-                {/* <DevelopmentModeNotice /> */}
-                {/* ^ kanske ta tillbaka i framtiden, så man kan se om funkar i development mode/inte developmentmode */}
+                    {/* <DevelopmentModeNotice /> */}
+                    {/* ^ kanske ta tillbaka i framtiden, så man kan se om funkar i development mode/inte developmentmode */}
 
-                {/* <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
+                    {/* <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
 
-                <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-                    <MonoText>screens/HomeScreen.js</MonoText>
-                </View>
+                    <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
+                        <MonoText>screens/HomeScreen.js</MonoText>
+                    </View>
 
-                <Text style={styles.getStartedText}>
-                    Change any of the , save the file, and your app will automatically reload.
-                </Text>
-                </View> */}
+                    <Text style={styles.getStartedText}>
+                        Change any of the , save the file, and your app will automatically reload.
+                    </Text>
+                    </View> */}
 
-                {/* <View style={styles.helpContainer}>
-                <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-                    <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-                </TouchableOpacity>*/}
-                <h2>Here's some stores in Stockholm</h2>
-                {slice.map(store => <div>{store.address}</div>)}
+                    {/* <View style={styles.helpContainer}>
+                    <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
+                        <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
+                    </TouchableOpacity>*/}
+                    <h2>Here's some stores in Stockholm</h2>
+                    {slice.map(store => <div>{store.address}</div>)}
+
+                    <h2>This is your closest store: (does not adapt to user geolocation, lat and long are hardcoded atm)</h2>
+                    <div>{this.state.closestStore}</div>
                 </View> 
             </ScrollView>
 
