@@ -4,14 +4,17 @@ import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Button } fro
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { MonoText } from '../components/StyledText';
-import {getStoresInCity, getStoreInventory, getClosestStore} from '../apiFunctions'
+import {getStoresInCity, getClosestStore, getStoreInventory} from '../apiFunctions'
 
 export default class HomeScreen extends React.Component {
     constructor() {
         super();
         this.state = {
             stores: [],
-            closestStore: ""};
+            closestStore: "",
+            storeId: "",
+            storeItems: []};
+        this.getInventory = this.getInventory.bind(this);
         this.getStores();
         this.getStore();
     }
@@ -20,7 +23,15 @@ export default class HomeScreen extends React.Component {
         getStoresInCity('stockholm').then(data=> this.setState({stores: data.items}))
     }
     getStore(){
-        getClosestStore(57.709111, 11.960399).then(data=> this.setState({closestStore: data.items[0]. address}))
+        getClosestStore(57.709111, 11.960399)
+        .then(data=> this.setState({
+            closestStore: data.items[0].address,
+            storeId: data.items[0].id
+        }, () => this.getInventory()))
+    }
+
+    getInventory(){
+        getStoreInventory(this.state.storeId).then(data => this.setState({storeItems: data.items}))
     }
 
     render(){
@@ -65,6 +76,10 @@ export default class HomeScreen extends React.Component {
 
                     <h2>This is your closest store: (does not adapt to user geolocation, lat and long are hardcoded atm)</h2>
                     <div>{this.state.closestStore}</div>
+
+                    <h2>Here's a drink from that store:</h2>
+                    {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.storeItems[Math.floor(Math.random() * (this.state.storeItems.length))].name}</div>}
+                    
                 </View> 
             </ScrollView>
 
