@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Platform } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
@@ -22,92 +22,95 @@ firebase.initializeApp(config);
 
 export default function LinksScreen() {
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      {/* <OptionButton
-        icon="md-school"
-        label="Read the Expo documentation"
-        onPress={() => WebBrowser.openBrowserAsync('https://docs.expo.io')}
-      />
+    <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        
+        <Text style={styles.headerText}>
+          Logga in
+        </Text>
 
-      <OptionButton
-        icon="md-compass"
-        label="Read the React Navigation documentation"
-        onPress={() => WebBrowser.openBrowserAsync('https://reactnavigation.org')}
-      />
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoText}>
+            <Input 
+              id="email"
+              placeholder="email"/>
+            <Input
+              id="password"
+              secureTextEntry={true}
+              placeholder="Password"/>
+              </Text>
+            <Text style={styles.infoText}>
+            <Button 
+              title="Login"
+              onPress={() => console.log("Hej")}
+            />
+            </Text>
+            <Text style={styles.infoText}>
+            <Button
+              title="Sign up"
+              color="#9c9c9c"
+              
+              onPress={() => {
+                const email = document.getElementById("email").value
+                const password = document.getElementById("password").value
+                const auth = firebase.auth();
+                const promise = auth.createUserWithEmailAndPassword(email,password)
+                promise
+                  .then(() => console.log("Yaaay"))
+                  .catch(e => console.log(e.message))
+              }}
+            />
+          </Text>
+        </View>
 
-      <OptionButton
-        icon="ios-chatboxes"
-        label="Ask a question on the forums"
-        onPress={() => WebBrowser.openBrowserAsync('https://forums.expo.io')}
-        isLastOption
-      /> */}
-      <Input 
-        id="email"
-        placeholder="email"/>
-      <Input
-        id="password"
-        secureTextEntry={true}
-        placeholder="Password"/>
-      <Button 
-        title="Login"
-        onPress={() => console.log("Hej")}
-      />
-      <Button 
-        title="Sign in"
-        onPress={() => {
-          const email = document.getElementById("email").value
-          const password = document.getElementById("password").value
-          const auth = firebase.auth();
-          const promise = auth.createUserWithEmailAndPassword(email,password)
-          promise
-            .then(() => console.log("Yaaay"))
-            .catch(e => console.log(e.message))
-        }}
-      />
     </ScrollView>
+    </View>
   );
 }
 
-function OptionButton({ icon, label, onPress, isLastOption }) {
-  return (
-    <RectButton style={[styles.option, isLastOption && styles.lastOption]} onPress={onPress}>
-      <View style={{ flexDirection: 'row' }}>
-        <View style={styles.optionIconContainer}>
-          <Ionicons name={icon} size={22} color="rgba(0,0,0,0.35)" />
-        </View>
-        <View style={styles.optionTextContainer}>
-          <Text style={styles.optionText}>{label}</Text>
-        </View>
-      </View>
-    </RectButton>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
+    backgroundColor: '#fbfbfb',
   },
   contentContainer: {
-    paddingTop: 15,
+    paddingTop: 0,
   },
-  optionIconContainer: {
-    marginRight: 12,
+  headerText: {
+    fontSize: 48,
+    color: 'rgba(96,100,109, 1)',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    paddingTop: '0.3em',
   },
-  option: {
-    backgroundColor: '#fdfdfd',
-    paddingHorizontal: 15,
-    paddingVertical: 15,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: 0,
-    borderColor: '#ededed',
+  infoContainer: {
+    position: 'relative',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: 'black',
+        shadowOffset: { width: 0, height: -3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 20,
+      },
+    }),
+    alignItems: 'center',
+    backgroundColor: '#fbfbfb',
+    paddingVertical: 20,
+    margin:40,
   },
-  lastOption: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  optionText: {
-    fontSize: 15,
-    alignSelf: 'flex-start',
-    marginTop: 1,
+  infoText: {
+    fontSize: 18,
+    color: 'rgba(96,100,109, 1)',
+    textAlign: 'left',
+    margin: 5,
+    color: 'black',
   },
 });

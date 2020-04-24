@@ -28,14 +28,6 @@ export default function BottomTabNavigator({ navigation, route }) {
         }}
       />
       <BottomTab.Screen
-        name="Links"
-        component={LinksScreen}
-        options={{
-          title: 'Logga in',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-log-in" />,
-        }}
-      />
-      <BottomTab.Screen
         name="Find"
         component={FindScreen}
         options={{
@@ -44,13 +36,22 @@ export default function BottomTabNavigator({ navigation, route }) {
         }}
       />
 
+      <BottomTab.Screen
+        name="Links"
+        component={LinksScreen}
+        options={{
+          title: 'Logga in',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-log-in" />,
+        }}
+      />
+      
+
     </BottomTab.Navigator>
   );
 }
 
 function getHeaderTitle(route) {
     // This will not currently be shown, since the header is hidden in App.js:
-
   const routeName = route.state?.routes[route.state.index]?.name ?? INITIAL_ROUTE_NAME;
 
   switch (routeName) {

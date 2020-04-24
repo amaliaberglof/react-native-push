@@ -29,9 +29,11 @@ export default function FindScreen() {
     return (
       <View style={styles.container}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
-        <View style={styles.tabBarInfoContainer}>
+      <Text style={styles.headerText}>
+          Hitta närmsta Systembolag
+        </Text>
+        <View style={styles.infoContainer}>
            
-      {/* <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> */}
 
             <Image
                       source={
@@ -64,7 +66,14 @@ export default function FindScreen() {
     contentContainer: {
       paddingTop: 0,
     },
-    tabBarInfoContainer: {
+    headerText: {
+      fontSize: 40,
+      color: 'rgba(96,100,109, 1)',
+      textAlign: 'center',
+      fontWeight: 'bold',
+      paddingTop: '0.4em',
+    },
+    infoContainer: {
       position: 'relative',
       bottom: 0,
       left: 0,
