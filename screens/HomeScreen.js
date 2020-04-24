@@ -2,7 +2,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Button } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-
+import FindScreen from './FindScreen.js'
 import { MonoText } from '../components/StyledText';
 import {getStoresInCity, getClosestStore, getStoreInventory} from '../apiFunctions'
 
@@ -38,40 +38,75 @@ export default class HomeScreen extends React.Component {
         let slice = this.state.stores.slice(0, 5);
 
         return (
+            // // <View style={styles.container}>
+            // {/* <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> */}
+            //     {/* <View style={styles.welcomeContainer}>
+            //     <Image
+            //         source={
+            //         __DEV__
+            //             ? require('../assets/images/logo.png')
+            //             : require('../assets/images/logo.png')
+            //         }
+            //         style={styles.welcomeImage}
+            //     />
+
+            //     </View> */}
+
+            //     {/* <View style={styles.getStartedContainer}> */}
+            //     {/* <DevelopmentModeNotice /> */}
+            //     {/* ^ kanske ta tillbaka i framtiden, så man kan se om funkar i development mode/inte developmentmode */}
+
+            //     {/* <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
+
+            //     <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
+            //         <MonoText>screens/HomeScreen.js</MonoText>
+            //     </View>
+
+            //     <Text style={styles.getStartedText}>
+            //         Change any of the , save the file, and your app will automatically reload.
+            //     </Text>
+            //     </View> */}
+
+            //     {/* <View style={styles.helpContainer}>
+            //     <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
+            //         <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
+            //     </TouchableOpacity>*/}
+                
+            //     {/* </View> 
+            // </ScrollView> */}
             <View style={styles.container}>
-            <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-                <View style={styles.welcomeContainer}>
-                <Image
-                    source={
-                    __DEV__
-                        ? require('../assets/images/logo.png')
-                        : require('../assets/images/logo.png')
-                    }
-                    style={styles.welcomeImage}
-                />
-
-                </View>
-
-                <View style={styles.getStartedContainer}>
-                    {/* <DevelopmentModeNotice /> */}
-                    {/* ^ kanske ta tillbaka i framtiden, så man kan se om funkar i development mode/inte developmentmode */}
-
-                    {/* <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
-
-                    <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-                        <MonoText>screens/HomeScreen.js</MonoText>
-                    </View>
-
-                    <Text style={styles.getStartedText}>
-                        Change any of the , save the file, and your app will automatically reload.
-                    </Text>
-                    </View> */}
-
-                    {/* <View style={styles.helpContainer}>
-                    <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-                        <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-                    </TouchableOpacity>*/}
-                    <h2>Here's some stores in Stockholm</h2>
+            <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
+              <View style={styles.tabBarInfoContainer}>
+                  {/* <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text> */}
+                  {/* <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
+                  <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
+                  </View> */}
+                  <Text style={styles.tabBarInfoText}>
+                  <h1>FindTheDrink</h1>
+                  <br />
+                  Såhär funkar det:
+                  <ul>
+                  <li>När du klickar på starta kommer appen hitta ditt närmsta systembolag</li>
+                  <li>Skaka din telefon! Shake it! shake it!</li>
+                  <li>En rekommendation på dryck från detta bolag kommer dyka upp</li>
+                  </ul>
+                  </Text> 
+                  <Button onPress={() => 
+                  {console.log("This button is out of order. :( Please use 'find drink' längst ner i fönstret istället, sålänge liksom")
+                  }}
+                  title="STARTA">
+                  </Button>
+                  <Text style={styles.helpLinkText}><div>Eller <u>logga in</u> för att se dina sparade förslag</div></Text>
+                  <Image
+                      source={
+                      __DEV__
+                          ? require('../assets/images/26711.jpg')
+                          : require('../assets/images/26711.jpg')
+                      }
+                      style={styles.cheersImage}
+                  />
+                  <Text style={styles.tabBarInfoText}>
+                  <h2>Here's some stores in Stockholm</h2>
                     {slice.map(store => <div>{store.address}</div>)}
 
                     <h2>This is your closest store: (does not adapt to user geolocation, lat and long are hardcoded atm)</h2>
@@ -80,33 +115,10 @@ export default class HomeScreen extends React.Component {
                     <h2>Here's a drink from that store:</h2>
                     {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.storeItems[Math.floor(Math.random() * (this.state.storeItems.length))].name}</div>}
                     
-                </View> 
+             
+                  </Text>
+              </View>
             </ScrollView>
-
-            <View style={styles.tabBarInfoContainer}>
-                {/* <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text> */}
-                {/* <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-                <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
-                </View> */}
-                <Text style={styles.tabBarInfoText}>Såhär funkar det:
-                <ul>
-                <li>Hitta närmsta systembolag</li>
-                <li>Skaka din telefon! Shake it! shake it!</li>
-                <li>A delicious beverage is recommended to you!</li>
-                </ul>
-                </Text> 
-                <Button
-                title="STARTA">
-                </Button>
-                <Image
-                    source={
-                    __DEV__
-                        ? require('../assets/images/26711.jpg')
-                        : require('../assets/images/26711.jpg')
-                    }
-                    style={styles.cheersImage}
-                />
-            </View>
             </View>
         )
     }
@@ -116,66 +128,66 @@ HomeScreen.navigationOptions = {
   header: null,
 };
 
-function DevelopmentModeNotice() {
-  if (__DEV__) {
-    const learnMoreButton = (
-      <Text onPress={handleLearnMorePress} style={styles.helpLinkText}>
-        Learn more
-      </Text>
-    );
+// function DevelopmentModeNotice() {
+//   if (__DEV__) {
+//     const learnMoreButton = (
+//       <Text onPress={handleLearnMorePress} style={styles.helpLinkText}>
+//         Learn more
+//       </Text>
+//     );
 
-    return (
-      <Text style={styles.developmentModeText}>
-        Development mode is enabled: your app will be slower but you can use useful development
-        tools. {learnMoreButton}
-      </Text>
-    );
-  } else {
-    return (
-      <Text style={styles.developmentModeText}>
-        You are not in development mode: your app will run at full speed.
-      </Text>
-    );
-  }
-}
+//     return (
+//       <Text style={styles.developmentModeText}>
+//         Development mode is enabled: your app will be slower but you can use useful development
+//         tools. {learnMoreButton}
+//       </Text>
+//     );
+//   } else {
+//     return (
+//       <Text style={styles.developmentModeText}>
+//         You are not in development mode: your app will run at full speed.
+//       </Text>
+//     );
+//   }
+// }
 
-function handleLearnMorePress() {
-  WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/workflow/development-mode/');
-}
+// function handleLearnMorePress() {
+//   WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/workflow/development-mode/');
+// }
 
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    'https://docs.expo.io/versions/latest/get-started/create-a-new-app/#making-your-first-change'
-  );
-}
+// function handleHelpPress() {
+//   WebBrowser.openBrowserAsync(
+//     'https://docs.expo.io/versions/latest/get-started/create-a-new-app/#making-your-first-change'
+//   );
+// }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fbfbfb',
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
-  },
+  // developmentModeText: {
+  //   marginBottom: 20,
+  //   color: 'rgba(0,0,0,0.4)',
+  //   fontSize: 14,
+  //   lineHeight: 19,
+  //   textAlign: 'center',
+  // },
   contentContainer: {
-    paddingTop: 30,
+    paddingTop: 0,
   },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 400,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
+  // welcomeContainer: {
+  //   alignItems: 'center',
+  //   marginTop: 10,
+  //   marginBottom: 20,
+  // },
+  // welcomeImage: {
+  //   width: 400,
+  //   height: 80,
+  //   resizeMode: 'contain',
+  //   marginTop: 3,
+  //   marginLeft: -10,
+  // },
   cheersImage: {
     width: 900,
     height: 200,
@@ -206,10 +218,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tabBarInfoContainer: {
-    position: 'absolute',
+    position: 'relative',
     bottom: 0,
     left: 0,
     right: 0,
+    padding: 10,
     ...Platform.select({
       ios: {
         shadowColor: 'black',
