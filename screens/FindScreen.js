@@ -5,6 +5,7 @@ import { StyleSheet, Text, View, Button, Image, Platform, Dimensions } from 'rea
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
+import {getStoresInCity, getClosestStore, getStoreInventory} from '../apiFunctions'
 
 import 'firebase/auth';
 
@@ -22,39 +23,119 @@ const config = {
     measurementId: "G-FCM6BTPP6X"
   };
   
+/* FIND USER POSITION */
+// function getLocation() {
+//   if (navigator.geolocation) {
+//     //navigator.geolocation.getCurrentPosition(showPosition);
+//     navigator.geolocation.getCurrentPosition(showPosition);
+//   } else { 
+//     document.getElementById("position").innerHTML = "Geolocation is not supported by this browser.";
+//   }
+// }
 
+// function showPosition(position) {
+//   document.getElementById("position").innerHTML = "Latitude: " + position.coords.latitude + 
+//   "<br>Longitude: " + position.coords.longitude;
+//   FindScreen.getStore(position.coords.latitude, position.coords.longitude)
+// }
 
-export default function FindScreen() {
+export default class FindScreen extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            stores: [],
+            closestStore: "",
+            storeId: "",
+            storeItems: [],
+            userLatitude: 0,
+            userLongitude: 0
+          };
+          this.getInventory = this.getInventory.bind(this);
+          this.setPosition = this.setPosition.bind(this);
+          this.getStore = this.getStore.bind(this);
+          this.getLocation();
+          this.getStores();
+      }
+  
+      getLocation() {
+        if (navigator.geolocation) {
+            console.log("Geolocation supported")
+          navigator.geolocation.getCurrentPosition(this.setPosition);
+        } else { 
+          console.log("Geolocation is not supported by this browser.");
+        }
+      }
+  
+      setPosition(position) {
+          console.log(position.coords)
+        this.setState({
+          userLatitude: position.coords.latitude,
+          userLongitude: position.coords.longitude
+        })
+        this.getStore(0);
+      }
+  
+      getStores(){
+          getStoresInCity('stockholm').then(data=> this.setState({stores: data.items}))
+      }
+  
+      getStore(index){
+          //console.log("lat, long: " + this.state.userLatitude + ", " + this.state.userLongitude)
+          getClosestStore(this.state.userLatitude, this.state.userLongitude)
+          .then(data=> this.setState({
+              closestStore: data.items[index].address,
+              storeId: data.items[index].id
+          }, () => this.getInventory(index)))
+      }
+  
+      getInventory(index){
+          getStoreInventory(this.state.storeId).then(data => 
+              (data != undefined) ? this.setState({storeItems: data.items}) :
+              this.getStore(index + 1))   //if the store inventory is undefined, take the next store
+      }
 
-    return (
-      <View style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
-      <Text style={styles.headerText}>
-          Hitta närmsta Systembolag
-        </Text>
-        <View style={styles.infoContainer}>
+    render(){
+        let slice = this.state.stores.slice(0, 5);
+
+        return (
+        <View style={styles.container}>
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
+            <Text style={styles.headerText}>
+                Hitta närmsta Systembolag
+            </Text>
+            <View style={styles.infoContainer}>
+            <Button 
+            title="FIND CLOSEST"
+            onPress={() => {this.getLocation()
+            }}
+            />
+            <div id="position"></div>
+                <Image
+                        source={
+                        __DEV__
+                            ? require('../assets/images/map.png')
+                            : require('../assets/images/map.png')
+                        }
+                        style={styles.mapImage}
+                    />
+                <Text style={styles.infoText}>
+                    <h2>Here's some stores in Stockholm</h2>
+                        {slice.map((store, i) => <div key={i}>{store.address}</div>)}
+
+                    <h2>This is your closest store: (does not adapt to user geolocation, lat and long are hardcoded atm)</h2>
+                        <div>{this.state.closestStore}</div>
+
+                    <h2>Here's a drink from that store:</h2>
+                        {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.storeItems[Math.floor(Math.random() * (this.state.storeItems.length))].name}</div>}
+                </Text>
+
            
-
-            <Image
-                      source={
-                      __DEV__
-                          ? require('../assets/images/map.png')
-                          : require('../assets/images/map.png')
-                      }
-                      style={styles.mapImage}
-                  />
-
-
-        <Button 
-          title="FIND CLOSEST"
-          onPress={() => {console.log("you press!")
-          }}
-        />
-                  </View>
-      </ScrollView>
-      </View>
-      
-    );
+            </View>
+        </ScrollView>
+        </View>
+        
+        )
+    }
   }
  
 

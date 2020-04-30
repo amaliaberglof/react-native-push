@@ -1,0 +1,11 @@
+*Skaka mobilen
+* deploya (Amalia) *** KLAR
+* Hämta användarens koordinater (Johanna) ******KLAR
+*Flytta API-grejer från home till find-screen ******KLAR
+* lägga in user i databas (Amalia) ***** KLAR
+* lägg till en user-view om user är definierad (Johanna)
+*Visualisera Systembolagen i närheten på en Google-Maps-karta (lägre prio)
+* redux-store
+* Inventory hämtas från en specifik Systemet nu, måste anpassa sig efter användarens closest store ********KLAR
+* Vissa Systemet har ej inventories (undefined), ta nästa Sytemet isf *********KLAR
+* Session management

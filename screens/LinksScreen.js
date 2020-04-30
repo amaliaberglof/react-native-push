@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Button, Platform } from 'react-native';
+import { StyleSheet, Text, View, Button, Platform, Image } from 'react-native';
 import { RectButton, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/firestore'
 
 const config = {
   apiKey: "AIzaSyAof_5Wo36Wn2B4vdT6ncqdOBeZRdFGsmE",
@@ -30,110 +31,145 @@ export default class LinksScreen extends React.Component {
       buttonText:'',
       signup:false,
       buttonHide:false,
+      userName: undefined
     }
   }
+
+  addUserToDatabase(userID) {
+    const db = firebase.firestore()
+    db.collection("users").doc(userID).set({
+      username: 'Username'
+    })
+    .then(() => {
+        this.setState({userName: 'Username'})
+        console.log("Document written")
+    })
+    .catch((err) => {
+        console.log("Error while writing, ", err)
+    })
+  }
+    //Denna är inte helt utvecklad än. För att funka bäst (just nu) borde den köras
+    // i componentDidMount eller liknande, men får vi upp en redux store så kommer vi kunna använda denna bättre
+  fetchUserName(userID) {
+    const db = firebase.firestore();
+    db.collection("users").doc(userID).get().then(doc => {
+        if(doc.exists) {
+              this.setState({userName: doc.data().username})
+        }
+        else {
+            console.log("No such user in database")
+        }
+    }).catch((err) => {
+        console.log(err)
+    })
+  }
+
+  LogOut() {
+    firebase.auth().signOut();
+    this.setState({user: undefined})
+    this.setState({userName: undefined})
+  }
+
 
   render() {
     return (
       <View style={styles.container} contentContainerStyle={styles.contentContainer}>
-        {(this.state.user === undefined) ? 
-        (this.state.buttonHide === true ? <View style={styles.Wrapper}><Input 
-          id="email"
-          placeholder="Email"/>
-        <Input
-          id="password"
-          secureTextEntry={true}
-          placeholder="Password"/>
-        <TouchableOpacity
-          style={styles.userButton}
-          onPress={() => {
-            if(this.state.signup) {
-              const email = document.getElementById("email").value
-              const password = document.getElementById("password").value
-              const auth = firebase.auth();
-              const promise = auth.createUserWithEmailAndPassword(email,password)
-              promise
-                .then(user => this.setState({user:user.user.uid}))
-                .catch(e => alert(e.message))
-            }
-            else if(this.state.login) {
-              const email = document.getElementById("email").value
-              const password = document.getElementById("password").value
-              const auth = firebase.auth();
-              const promise = auth.signInWithEmailAndPassword(email,password)
-              promise
-                .then(user => this.setState({user:user.user.uid}))
-                .catch(e => alert(e.message))
-            }
-          }}
-        ><Text style={styles.userButtonText}>{this.state.buttonText}</Text></TouchableOpacity></View>:<View style={styles.Wrapper}>
-          <TouchableOpacity
-            style={styles.myButton} 
-            onPress={() => {
-              this.setState({login:true, signup:false, buttonHide:true, buttonText:'Log in'})
-            }}>
-              <Text style={styles.myButtonText}>Log in</Text>
-          </TouchableOpacity>
-          </View>):<Text>You're now logged in! Go have some fun!</Text>}
-          {this.state.user === undefined ? 
-          (this.state.signup ? <Text onPress={() => {this.setState({signup:false, login:true, buttonText:'Log in'})}}
-                                    style ={styles.signUpText}>Click here if you want to login instead</Text>:
-          <Text style={styles.signUpText}
-            onPress={() => {
-              this.setState({signup:true, login:false, buttonHide:true, buttonText:'Sign up'})
-            }}>Click here if you don't have an account</Text>):<Text></Text>}
-            {/* <OptionButton
-        icon="md-school"
-        label="Read the Expo documentation"
-        onPress={() => WebBrowser.openBrowserAsync('https://docs.expo.io')}
-      />
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoText}>
-            <Input 
-              id="email"
-              placeholder="email"/>
-            <Input
-              id="password"
-              secureTextEntry={true}
-              placeholder="Password"/>
-              </Text>
-            <Text style={styles.infoText}>
-            <Button 
-              title="Login"
-              onPress={() => console.log("Hej")}
-            />
-            </Text>
-            <Text style={styles.infoText}>
-            <Button
-              title="Sign up"
-              color="#9c9c9c"
-              
-              onPress={() => {
+        {/* VIEW 1 */}
+        {(this.state.user === undefined) ? 
+
+        // To be displayed before the user logs in
+        (this.state.buttonHide === true ? 
+        <View style={styles.Wrapper}>
+          <Input 
+            id="email"
+            placeholder="Email"/>
+          <Input
+            id="password"
+            secureTextEntry={true}
+            placeholder="Password"/>
+          <TouchableOpacity
+            style={styles.userButton}
+
+            // Logging in:
+            onPress={() => {
+              if(this.state.signup) {
                 const email = document.getElementById("email").value
                 const password = document.getElementById("password").value
                 const auth = firebase.auth();
                 const promise = auth.createUserWithEmailAndPassword(email,password)
                 promise
-                  .then(() => console.log("Yaaay"))
-                  .catch(e => console.log(e.message))
-              }}
-            />
-          </Text>
-        </View>
+                .then(user => {
+                  this.setState({user:user.user.uid})
+                  this.addUserToDatabase(user.user.uid)
+                })
+                  .catch(e => alert(e.message))
+              }
+              else if(this.state.login) {
+                const email = document.getElementById("email").value
+                const password = document.getElementById("password").value
+                const auth = firebase.auth();
+                const promise = auth.signInWithEmailAndPassword(email,password)
+                promise
+                .then(user => {
+                  this.setState({user:user.user.uid})
+                  this.fetchUserName(user.user.uid)
+                })
+                  .catch(e => alert(e.message))
+              }
+            }}>
+              
+          <Text style={styles.userButtonText}>{this.state.buttonText}</Text>
+          </TouchableOpacity></View>:<View style={styles.Wrapper}>
 
-      <OptionButton
-        icon="ios-chatboxes"
-        label="Ask a question on the forums"
-        onPress={() => WebBrowser.openBrowserAsync('https://forums.expo.io')}
-        isLastOption
-      /> */}
+          <TouchableOpacity
+            style={styles.myButton} 
+            onPress={() => {
+              this.setState({login:true, signup:false, buttonHide:true, buttonText:'Log in'})
+            }}>
+
+          <Text style={styles.myButtonText}>Log in</Text>
+          </TouchableOpacity>
+
+
+          <View>
+          {this.state.signup ? <Text onPress={() => {this.setState({signup:false, login:true, buttonText:'Log in'})}}
+                                    style ={styles.signUpText}>Click here if you want to login instead</Text>:
+          <Text style={styles.signUpText}
+            onPress={() => {
+              this.setState({signup:true, login:false, buttonHide:true, buttonText:'Sign up'})
+            }}>Click here if you don't have an account</Text>}
+          </View>
+          </View>)
+          
+          :
+          // VIEW 2
+          // PROFILE PAGE:
+            profileView(this.state.userName)
+          }
+  
     </View>
     )
   }
-
 }
 
+
+const profileView = (username) => {
+  return(
+    (<View style={styles.Wrapper}>
+        
+        <Image source={require('../assets/images/avatar2.png')} style={styles.avatarImage}/>
+
+        <Text>HELLO You're now logged in {username}! Go have some fun!</Text>
+          <TouchableOpacity
+          style={styles.userButton}
+          onPress={() => {
+            this.LogOut()
+          }}
+        ><Text style={styles.userButtonText}>Log out</Text></TouchableOpacity>
+    </View>)
+  )
+}
 
 function OptionButton({ icon, label, onPress, isLastOption }) {
   return (
@@ -230,5 +266,12 @@ const styles = StyleSheet.create({
     fontSize:15,
     margin:10
 
-  }
+  },
+  avatarImage: {
+    width: 900,
+    height: 200,
+    resizeMode: 'contain',
+    marginTop: 3,
+    marginBottom: 0,
+    marginLeft: -10,  }
 });
