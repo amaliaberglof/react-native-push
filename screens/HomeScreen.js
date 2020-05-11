@@ -12,18 +12,18 @@ export default class HomeScreen extends React.Component {
           <View style={styles.container}>
             <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
 
-              <Text style={styles.headerText}>FindTheDrink</Text>
               <View style={styles.infoContainer}>
 
-                  <Image source={require('../assets/images/26711.jpg')} style={styles.cheersImage}/>
+                  <Image source={require('../assets/images/frontpagelogo.png')} style={styles.logoImage}/>
                   
                   <Text style={styles.infoText}>
                     <br />
                     Såhär funkar det:
                     <ul>
                     <li>När du klickar på starta kommer appen hitta ditt närmsta systembolag</li>
-                    <li>Skaka din telefon! Shake it! shake it!</li>
                     <li>En rekommendation på dryck från detta bolag kommer dyka upp</li>
+                    <li>Tycker du inte om rekomendationen kan du snurra din telefon 360°, så får du ett nytt förslag</li>
+                    <li>Logga in eller skapa en profil för att spara dina förslag</li>
                     </ul>
                   </Text> 
 
@@ -36,8 +36,12 @@ export default class HomeScreen extends React.Component {
                   <Text style={styles.helpLinkText}>
                     <div>Eller <u>logga in</u> för att se dina sparade förslag</div>
                   </Text>
+                  <Image source={require('../assets/images/frontpageimg.png')} style={styles.bottomImage}/>
+
               </View>
+
             </ScrollView>
+
           </View>
         )
     }
@@ -62,13 +66,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     paddingTop: '0.3em',
   },
-  cheersImage: {
-    width: 900,
+  logoImage: {
+    width: 300,
     height: 200,
     resizeMode: 'contain',
     marginTop: 3,
     marginBottom: 0,
     marginLeft: -10,
+  },
+  bottomImage: {
+    width: 500,
+    height: 200,
+    marginLeft: 0,
+    paddingLeft: 0,
+    resizeMode: 'contain',
   },
   infoContainer: {
     position: 'relative',

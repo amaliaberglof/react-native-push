@@ -168,47 +168,38 @@ export default class FindScreen extends React.Component {
             </Text>
 
             <View style={styles.infoContainer}>
-            <Button 
+            {/* <Button 
             title="FIND CLOSEST"
             onPress={() => {this.getLocation()
             }}
-            />
+            /> */}
 
 
             <div id="position"></div>
-                <Image
-                        source={
-                        __DEV__
-                            ? require('../assets/images/map.png')
-                            : require('../assets/images/map.png')
-                        }
-                        style={styles.mapImage}
-                    />
+                
                 <Text style={styles.infoText}>
-                    <h2>Here's some stores in Stockholm</h2>
-                        {slice.map((store, i) => <div key={i}>{store.address}</div>)}
+                    {/* <h2>Here's some stores in Stockholm</h2>
+                        {slice.map((store, i) => <div key={i}>{store.address}</div>)} */}
 
                     <h2>This is your closest store: (With an invetory)</h2>
                         <div>{this.state.closestStore}</div>
 
                     <h2>Here's a drink from that store:</h2>
                         {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrink}</div>}
-
-                    <h2>Here's your stored drinks</h2>
-                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map(drink => <div>{drink}</div>)}
-                </Text>
-                <Button 
+                 </Text>
+                 <Button 
                           title="No! I want a new drink >:("
                           onPress={() => {this.clicked()
                           }}
                           />
-            <div id="infotext"></div>
-            <div id="directionNeeded"></div>
-            <div id ="direction"></div>
-            <div id="success"></div>
-
-
-           
+                          <div id="infotext"></div>
+                          <div id="directionNeeded"></div>
+                          <div id ="direction"></div>
+                          <div id="success"></div>
+                 <Text>
+                    <h2>Here are your stored drinks:</h2>
+                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map(drink => <div>{drink}</div>)}
+                </Text>
             </View>
         </ScrollView>
         </View>
