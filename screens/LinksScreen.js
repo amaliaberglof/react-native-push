@@ -160,7 +160,11 @@ const profileView = (username) => {
         
         <Image source={require('../assets/images/avatar2.png')} style={styles.avatarImage}/>
 
-        <Text>HELLO You're now logged in {username}! Go have some fun!</Text>
+        <Text style={styles.infoText}><br/>HELLO {username}!<br/></Text>
+
+        <Text style={styles.infoText}>Here are the drinks you have saved:</Text> 
+        <TabBarIcon name="ios-beer" />
+
           <TouchableOpacity
           style={styles.userButton}
           onPress={() => {
@@ -271,7 +275,7 @@ const styles = StyleSheet.create({
     width: 900,
     height: 200,
     resizeMode: 'contain',
-    marginTop: 3,
+    marginTop: 1,
     marginBottom: 0,
     marginLeft: -10,  }
 });
