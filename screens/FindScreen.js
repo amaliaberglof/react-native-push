@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Button, Image, Platform, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, Platform, Dimensions, componentDidMount } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
@@ -48,14 +48,30 @@ export default class FindScreen extends React.Component {
             storeId: "",
             storeItems: [],
             userLatitude: 0,
-            userLongitude: 0
+            userLongitude: 0,
+            userDrinks: undefined
           };
+          this.getUserDrinks = this.getUserDrinks.bind(this);
           this.getInventory = this.getInventory.bind(this);
           this.setPosition = this.setPosition.bind(this);
           this.getStore = this.getStore.bind(this);
           this.getLocation();
           this.getStores();
+          this.getUserDrinks();
       }
+
+      getUserDrinks(){
+        // Lay connection with the database.
+        var firestore = firebase.firestore();
+        // "4xpG9YaWAUpp39ALV8hx" is a hardcoded user id, should be dynamic!*************************************************************
+        var coll = firestore.collection("users").doc("4xpG9YaWAUpp39ALV8hx").collection('testDrinks')
+
+        coll.get().then(coll =>
+            //console.log("Document data:", Object.values(coll.docs[0].data()))
+            this.setState({userDrinks: Object.values(coll.docs[0].data())})
+            )
+        
+    }
   
       getLocation() {
         if (navigator.geolocation) {
@@ -94,6 +110,11 @@ export default class FindScreen extends React.Component {
               this.getStore(index + 1))   //if the store inventory is undefined, take the next store
       }
 
+
+      componentDidMount(){
+      }
+      
+
     render(){
         let slice = this.state.stores.slice(0, 5);
 
@@ -109,6 +130,13 @@ export default class FindScreen extends React.Component {
             onPress={() => {this.getLocation()
             }}
             />
+
+            {/* Navigation */}
+            <Text>Device orientation:</Text>
+            <div id="information"></div>
+            <div id="is"></div>
+            {/* Navigation */}
+
             <div id="position"></div>
                 <Image
                         source={
@@ -127,6 +155,9 @@ export default class FindScreen extends React.Component {
 
                     <h2>Here's a drink from that store:</h2>
                         {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.storeItems[Math.floor(Math.random() * (this.state.storeItems.length))].name}</div>}
+
+                    <h2>Here's your stored drinks</h2>
+                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map(drink => <div>{drink}</div>)}
                 </Text>
 
            
@@ -137,7 +168,7 @@ export default class FindScreen extends React.Component {
         )
     }
   }
- 
+
 
   const styles = StyleSheet.create({
     container: {
