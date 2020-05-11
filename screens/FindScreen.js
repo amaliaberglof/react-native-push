@@ -32,7 +32,7 @@ export default class FindScreen extends React.Component {
             storeItems: [],
             userLatitude: 0,
             userLongitude: 0,
-            userDrinks: undefined,
+            userDrinks: [],
             currentDrink: undefined
           };
           this.getInventory = this.getInventory.bind(this);
@@ -40,6 +40,7 @@ export default class FindScreen extends React.Component {
           this.getStore = this.getStore.bind(this);
           this.getLocation();
           this.getStores();
+          this.getUserDrinks();
       }
 
 
@@ -64,15 +65,26 @@ export default class FindScreen extends React.Component {
           //Lay connection with the database.
           var drinks = []
           var firestore = firebase.firestore();
-          var coll = firestore.collection("users").doc(this.state.user).collection('Drinks')
-          coll.get().then(coll => {
-          coll.forEach(doc => drinks.push(doc.data().drink))
-          this.setState({userDrinks: drinks})
-          }
-        )
-        }
-        
+          var coll = firestore.collection("users").doc(this.state.user)
+          coll.get().then(doc => {
+            console.log(doc.data())
+            if (doc.data().drinks !== undefined){
+                doc.data().drinks.forEach(drink => drinks.push(drink))
+                this.setState({userDrinks: drinks})
+            }
+          })
+        }   
     }
+
+        addDrink(drink){
+            this.setState({userDrinks: [...this.state.userDrinks, drink]})
+
+            var firestore = firebase.firestore();
+            var drinksRef = firestore.collection("users").doc(this.state.user);
+            var setWithMerge = drinksRef.set({
+                drinks: [...this.state.userDrinks, drink]
+            }, { merge: true });
+        }
   
       getLocation() {
         if (navigator.geolocation) {
@@ -186,6 +198,14 @@ export default class FindScreen extends React.Component {
 
                     <h2>Here's a drink from that store:</h2>
                         {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrink}</div>}
+                    
+                    <Button 
+                        title="Add this drink!" 
+                        onPress={() => {this.addDrink(this.state.currentDrink)}}
+                        disabled={this.state.user === undefined}
+                    
+                    />
+                    
                  </Text>
                  <Button 
                           title="No! I want a new drink >:("
@@ -198,7 +218,7 @@ export default class FindScreen extends React.Component {
                           <div id="success"></div>
                  <Text>
                     <h2>Here are your stored drinks:</h2>
-                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map(drink => <div>{drink}</div>)}
+                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map((drink, i) => <div key={i}>{drink}</div>)}
                 </Text>
             </View>
         </ScrollView>
