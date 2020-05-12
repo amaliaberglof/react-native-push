@@ -38,8 +38,6 @@ export default class FindScreen extends React.Component {
           this.getInventory = this.getInventory.bind(this);
           this.setPosition = this.setPosition.bind(this);
           this.getStore = this.getStore.bind(this);
-          this.getLocation();
-          this.getStores();
       }
 
 
@@ -145,6 +143,8 @@ export default class FindScreen extends React.Component {
       }
     
       componentDidMount() {
+        this.getLocation();
+        this.getStores();
         firebase.auth().onAuthStateChanged(this.handleStateChange);
       }
       
