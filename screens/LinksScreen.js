@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import TabBarIcon from '../components/TabBarIcon';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { StyleSheet, Text, View, Button, Platform, Image } from 'react-native';
@@ -31,7 +32,8 @@ export default class LinksScreen extends React.Component {
       buttonText:'',
       signup:false,
       buttonHide:false,
-      userName: undefined
+      userName: undefined,
+      userDrinks: undefined,
     }
   }
 
@@ -70,9 +72,27 @@ export default class LinksScreen extends React.Component {
     this.setState({userName: undefined})
   }
 
+  getUserDrinks(){
+    if (this.state.user !== undefined) {
+      //Lay connection with the database.
+      var drinks = []
+      var firestore = firebase.firestore();
+      var coll = firestore.collection("users").doc(this.state.user)
+      coll.get().then(doc => {
+        console.log(doc.data())
+        if (doc.data().drinks !== undefined){
+            doc.data().drinks.forEach(drink => drinks.push(drink))
+            this.setState({userDrinks: drinks})
+            console.log(drinks)
+        }
+      })
+    }   
+}
+
   handleStateChange = (user) => {
     if(user) {
       this.setState({user:user.uid})
+      this.getUserDrinks();
     }
     else {
       console.log("Not logged in")
@@ -159,7 +179,7 @@ export default class LinksScreen extends React.Component {
           :
           // VIEW 2
           // PROFILE PAGE:
-            profileView(this.state.userName)
+            profileView(this.state.userName, this.state.userDrinks)
           }
   
     </View>
@@ -168,7 +188,7 @@ export default class LinksScreen extends React.Component {
 }
 
 
-const profileView = (username) => {
+const profileView = (username, drinks) => {
   return(
     (<View style={styles.Wrapper}>
         
@@ -177,7 +197,11 @@ const profileView = (username) => {
         <Text style={styles.infoText}><br/>HELLO {username}!<br/></Text>
 
         <Text style={styles.infoText}>Here are the drinks you have saved:</Text> 
-        {/* <TabBarIcon name="ios-beer" /> */}
+        {drinks === undefined? <div>You haven't saved any drinks</div> : drinks.map((drink,index) => (
+         <div key={index}>
+          <TabBarIcon name="ios-beer"/>
+          <div key={index}>{drink}</div>
+        </div>))}
 
           <TouchableOpacity
           style={styles.userButton}
