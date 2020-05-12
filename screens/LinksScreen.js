@@ -3,7 +3,7 @@ import TabBarIcon from '../components/TabBarIcon';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { StyleSheet, Text, View, Button, Platform, Image, Alert, Modal, TouchableHighlight } from 'react-native';
-import { RectButton, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { RectButton, ScrollView, TouchableOpacity, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
@@ -81,11 +81,9 @@ export default class LinksScreen extends React.Component {
       var firestore = firebase.firestore();
       var coll = firestore.collection("users").doc(this.state.user)
       coll.get().then(doc => {
-        console.log(doc.data())
         if (doc.data().drinks !== undefined){
             doc.data().drinks.forEach(drink => drinks.push(drink))
             this.setState({userDrinks: drinks})
-            console.log(drinks)
         }
       })
     }   
@@ -198,8 +196,8 @@ export default class LinksScreen extends React.Component {
                     <Ionicons 
                       name="ios-beer"
                       size={30}
-                    onPress={() => this.setState({focusDrink:drink.name, modalVisible:true})}/>
-                    <Text style={styles.infoText} key={index}>  {drink.name}</Text>
+                    onPress={() => this.setState({focusDrink:drink, modalVisible:true})}/>
+                    <Text style={styles.infoText} key={index}> {drink.name}</Text>
                   </div>))}
               </View>
               <TouchableOpacity
@@ -210,9 +208,22 @@ export default class LinksScreen extends React.Component {
                 <Text style={styles.userButtonText}>Log out</Text>
               </TouchableOpacity>
               {this.state.modalVisible ?
-            <View style={styles.modal}>
+            <View 
+            onTouchEndCapture
+            ={() => this.setState({modalVisible:false})}
+            style={styles.modal}>
               <View style={styles.modalContent}>
-              <Text>Hej!</Text>
+                <View style={styles.closeModal}>
+                  <Text
+                  onPress={() => this.setState({modalVisible:false})}
+                  style={styles.closeModalText}>X</Text></View>
+              <Text style={styles.drinkHeader}>{this.state.focusDrink.name}</Text>
+              <View style={styles.drinkInfo}>
+                <Text>Found at {this.state.focusDrink.location}</Text>
+              <Text>Cost: {this.state.focusDrink.price} SEK | Alc.: {this.state.focusDrink.alcohol_vol}%</Text>
+              <Text>Country: {this.state.focusDrink.country} | Producer: {this.state.focusDrink.producer}</Text>
+              {this.state.focusDrink.items < 15 ? <Text>This item is almost out of stock!</Text>:<Text>You don't need to rush - there's a lot of this drink at the store</Text>}
+              </View>
               </View>
             </View> :<div></div>}
     </View>)
@@ -334,6 +345,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
     marginBottom: 0,
     marginLeft: -10,  },
+
   modal: {
     display: 'block',
     position: 'fixed', /* Stay in place */
@@ -341,6 +353,7 @@ const styles = StyleSheet.create({
     paddingTop: 100, /* Location of the box */
     left: 0,
     top: 0,
+    bottom: 0,
     width: '100%', /* Full width */
     height: '100%', /* Full height */
     overflow: 'auto', /* Enable scroll if needed */
@@ -348,11 +361,35 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)', /* Black w/ opacity */
   },
   modalContent: {
+    borderRadius:10,
     backgroundColor: '#fefefe',
     margin: 'auto',
     padding: 10,
-    paddingBottom:0,
-    border: '1px solid #888',
-    width: '80%'
+    width: '80%',
+    height:'80%'
+  },
+  drinkHeader: {
+    paddingTop:25,
+    fontSize: 25,
+    textAlign: 'center',
+  },
+  closeModal: {
+    width:25,
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    display:'block',
+    backgroundColor: 'grey',
+    padding:7,
+    paddingLeft:8,
+    borderRadius:10,
+  },
+  closeModalText: {
+    textAlign: 'center',
+  },
+  drinkInfo: {
+    marginTop:10,
+    alignContent: 'center',
+    alignItems: 'center',
   }
 });
