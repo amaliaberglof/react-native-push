@@ -9,7 +9,14 @@ import FindScreen from '../screens/FindScreen';
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
 
-export default function BottomTabNavigator({ navigation, route }) {
+
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+
+
+
+
+export default function BottomTabNavigator({ navigation, route,  }) {
   // Set the header title on the parent stack navigator depending on the
   // currently active tab. Learn more in the documentation:
   // https://reactnavigation.org/docs/en/screen-options-resolution.html
@@ -18,6 +25,7 @@ export default function BottomTabNavigator({ navigation, route }) {
   navigation.setOptions({ headerTitle: getHeaderTitle(route) });
 
   return (
+    
     <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
       <BottomTab.Screen
         name="Home"
@@ -40,8 +48,8 @@ export default function BottomTabNavigator({ navigation, route }) {
         name="Links"
         component={LinksScreen}
         options={{
-          title: 'Logga in',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-log-in" />,
+          title: 'Din profil',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-person" />,
         }}
       />
       
