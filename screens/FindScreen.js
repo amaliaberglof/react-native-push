@@ -32,7 +32,7 @@ export default class FindScreen extends React.Component {
             storeItems: [],
             userLatitude: 0,
             userLongitude: 0,
-            userDrinks: undefined,
+            userDrinks: [],
             currentDrink: undefined
           };
           this.getInventory = this.getInventory.bind(this);
@@ -40,6 +40,7 @@ export default class FindScreen extends React.Component {
           this.getStore = this.getStore.bind(this);
           this.getLocation();
           this.getStores();
+          this.getUserDrinks();
       }
 
 
@@ -64,15 +65,26 @@ export default class FindScreen extends React.Component {
           //Lay connection with the database.
           var drinks = []
           var firestore = firebase.firestore();
-          var coll = firestore.collection("users").doc(this.state.user).collection('Drinks')
-          coll.get().then(coll => {
-          coll.forEach(doc => drinks.push(doc.data().drink))
-          this.setState({userDrinks: drinks})
-          }
-        )
-        }
-        
+          var coll = firestore.collection("users").doc(this.state.user)
+          coll.get().then(doc => {
+            console.log(doc.data())
+            if (doc.data().drinks !== undefined){
+                doc.data().drinks.forEach(drink => drinks.push(drink))
+                this.setState({userDrinks: drinks})
+            }
+          })
+        }   
     }
+
+        addDrink(drink){
+            this.setState({userDrinks: [...this.state.userDrinks, drink]})
+
+            var firestore = firebase.firestore();
+            var drinksRef = firestore.collection("users").doc(this.state.user);
+            var setWithMerge = drinksRef.set({
+                drinks: [...this.state.userDrinks, drink]
+            }, { merge: true });
+        }
   
       getLocation() {
         if (navigator.geolocation) {
@@ -168,47 +180,46 @@ export default class FindScreen extends React.Component {
             </Text>
 
             <View style={styles.infoContainer}>
-            <Button 
+            {/* <Button 
             title="FIND CLOSEST"
             onPress={() => {this.getLocation()
             }}
-            />
+            /> */}
 
 
             <div id="position"></div>
-                <Image
-                        source={
-                        __DEV__
-                            ? require('../assets/images/map.png')
-                            : require('../assets/images/map.png')
-                        }
-                        style={styles.mapImage}
-                    />
+                
                 <Text style={styles.infoText}>
-                    <h2>Here's some stores in Stockholm</h2>
-                        {slice.map((store, i) => <div key={i}>{store.address}</div>)}
+                    {/* <h2>Here's some stores in Stockholm</h2>
+                        {slice.map((store, i) => <div key={i}>{store.address}</div>)} */}
 
                     <h2>This is your closest store: (With an invetory)</h2>
                         <div>{this.state.closestStore}</div>
 
                     <h2>Here's a drink from that store:</h2>
                         {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrink}</div>}
-
-                    <h2>Here's your stored drinks</h2>
-                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map(drink => <div>{drink}</div>)}
-                </Text>
-                <Button 
+                    
+                    <Button 
+                        title="Add this drink!" 
+                        onPress={() => {this.addDrink(this.state.currentDrink)}}
+                        disabled={this.state.user === undefined}
+                    
+                    />
+                    
+                 </Text>
+                 <Button 
                           title="No! I want a new drink >:("
                           onPress={() => {this.clicked()
                           }}
                           />
-            <div id="infotext"></div>
-            <div id="directionNeeded"></div>
-            <div id ="direction"></div>
-            <div id="success"></div>
-
-
-           
+                          <div id="infotext"></div>
+                          <div id="directionNeeded"></div>
+                          <div id ="direction"></div>
+                          <div id="success"></div>
+                 <Text>
+                    <h2>Here are your stored drinks:</h2>
+                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map((drink, i) => <div key={i}>{drink}</div>)}
+                </Text>
             </View>
         </ScrollView>
         </View>
