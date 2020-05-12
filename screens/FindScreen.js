@@ -40,7 +40,6 @@ export default class FindScreen extends React.Component {
           this.getStore = this.getStore.bind(this);
           this.getLocation();
           this.getStores();
-          this.getUserDrinks();
       }
 
 
