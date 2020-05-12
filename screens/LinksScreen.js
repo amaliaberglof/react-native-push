@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import TabBarIcon from '../components/TabBarIcon';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Button, Platform, Image } from 'react-native';
+import { StyleSheet, Text, View, Button, Platform, Image, Alert, Modal, TouchableHighlight } from 'react-native';
 import { RectButton, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
@@ -34,6 +34,8 @@ export default class LinksScreen extends React.Component {
       buttonHide:false,
       userName: undefined,
       userDrinks: undefined,
+      focusDrink: undefined,
+      modalVisible: false,
     }
   }
 
@@ -50,8 +52,8 @@ export default class LinksScreen extends React.Component {
         console.log("Error while writing, ", err)
     })
   }
-    //Denna är inte helt utvecklad än. För att funka bäst (just nu) borde den köras
-    // i componentDidMount eller liknande, men får vi upp en redux store så kommer vi kunna använda denna bättre
+
+
   fetchUserName(userID) {
     const db = firebase.firestore();
     db.collection("users").doc(userID).get().then(doc => {
@@ -92,6 +94,7 @@ export default class LinksScreen extends React.Component {
   handleStateChange = (user) => {
     if(user) {
       this.setState({user:user.uid})
+      this.fetchUserName(user.uid);
       this.getUserDrinks();
     }
     else {
@@ -179,7 +182,41 @@ export default class LinksScreen extends React.Component {
           :
           // VIEW 2
           // PROFILE PAGE:
-            profileView(this.state.userName, this.state.userDrinks)
+            (
+            <View style={styles.Wrapper}>
+              <View style={styles.ProfileView}>
+        
+                 <Image source={require('../assets/images/avatar2.png')} style={styles.avatarImage}/>
+
+                  <Text style={styles.infoText}><br/>HELLO {this.state.userName}!<br/></Text>
+
+                  <Text style={styles.infoText}>Here are the drinks you have saved. 
+                  <br/>Click on the beer-icon to get more information!</Text> 
+                  {this.state.userDrinks === undefined? <div>You haven't saved any drinks</div> 
+                  : this.state.userDrinks.map((drink,index) => (
+                    <div key={index}>
+                    <Ionicons 
+                      name="ios-beer"
+                      size={30}
+                    onPress={() => this.setState({focusDrink:drink.name, modalVisible:true})}/>
+                    <Text style={styles.infoText} key={index}>  {drink.name}</Text>
+                  </div>))}
+              </View>
+              <TouchableOpacity
+                style={styles.userButton}
+                onPress={() => {
+                  this.LogOut()
+                }}>
+                <Text style={styles.userButtonText}>Log out</Text>
+              </TouchableOpacity>
+              {this.state.modalVisible ?
+            <View style={styles.modal}>
+              <View style={styles.modalContent}>
+              <Text>Hej!</Text>
+              </View>
+            </View> :<div></div>}
+    </View>)
+            
           }
   
     </View>
@@ -187,31 +224,6 @@ export default class LinksScreen extends React.Component {
   }
 }
 
-
-const profileView = (username, drinks) => {
-  return(
-    (<View style={styles.Wrapper}>
-        
-        <Image source={require('../assets/images/avatar2.png')} style={styles.avatarImage}/>
-
-        <Text style={styles.infoText}><br/>HELLO {username}!<br/></Text>
-
-        <Text style={styles.infoText}>Here are the drinks you have saved:</Text> 
-        {drinks === undefined? <div>You haven't saved any drinks</div> : drinks.map((drink,index) => (
-         <div key={index}>
-          <TabBarIcon name="ios-beer"/>
-          <span key={index}>  {drink}</span>
-        </div>))}
-
-          <TouchableOpacity
-          style={styles.userButton}
-          onPress={() => {
-            this.LogOut()
-          }}
-        ><Text style={styles.userButtonText}>Log out</Text></TouchableOpacity>
-    </View>)
-  )
-}
 
 function OptionButton({ icon, label, onPress, isLastOption }) {
   return (
@@ -269,7 +281,7 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 18,
     color: 'rgba(96,100,109, 1)',
-    textAlign: 'left',
+    textAlign: 'center',
     margin: 5,
     color: 'black',
   },
@@ -298,6 +310,12 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: 'white'
   },
+  ProfileView: {
+    flex:1,
+    margin:10,
+    alignContent: 'center',
+    alignItems: 'center',
+  },
   Wrapper: {
     flex:1,
     alignContent: 'center',
@@ -315,5 +333,26 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginTop: 1,
     marginBottom: 0,
-    marginLeft: -10,  }
+    marginLeft: -10,  },
+  modal: {
+    display: 'block',
+    position: 'fixed', /* Stay in place */
+    zIndex: 1, /* Sit on top */
+    paddingTop: 100, /* Location of the box */
+    left: 0,
+    top: 0,
+    width: '100%', /* Full width */
+    height: '100%', /* Full height */
+    overflow: 'auto', /* Enable scroll if needed */
+    backgroundColor: 'rgb(0,0,0)', /* Fallback color */
+    backgroundColor: 'rgba(0,0,0,0.4)', /* Black w/ opacity */
+  },
+  modalContent: {
+    backgroundColor: '#fefefe',
+    margin: 'auto',
+    padding: 10,
+    paddingBottom:0,
+    border: '1px solid #888',
+    width: '80%'
+  }
 });
