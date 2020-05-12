@@ -200,7 +200,7 @@ const profileView = (username, drinks) => {
         {drinks === undefined? <div>You haven't saved any drinks</div> : drinks.map((drink,index) => (
          <div key={index}>
           <TabBarIcon name="ios-beer"/>
-          <div key={index}>{drink}</div>
+          <span key={index}>  {drink}</span>
         </div>))}
 
           <TouchableOpacity

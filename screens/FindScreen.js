@@ -126,8 +126,10 @@ export default class FindScreen extends React.Component {
 
       getSingleDrink() {
         if(this.state.storeItems.length > 0) {
-          var singledrink = this.state.storeItems[Math.floor(Math.random() * (this.state.storeItems.length))].name
-          this.setState({currentDrink: singledrink})
+          console.log(this.state.storeItems)
+          var singledrink = this.state.storeItems[Math.floor(Math.random() * (this.state.storeItems.length))]
+          var singledrinkInfo = {...singledrink, location:this.state.closestStore}
+          this.setState({currentDrink: singledrinkInfo, currentDrinkName: singledrinkInfo.name})
         }
       }
 
@@ -196,7 +198,7 @@ export default class FindScreen extends React.Component {
                         <div>{this.state.closestStore}</div>
 
                     <h2>Here's a drink from that store:</h2>
-                        {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrink}</div>}
+                        {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrinkName}</div>}
                     
                     <Button 
                         title="Add this drink!" 
@@ -217,7 +219,7 @@ export default class FindScreen extends React.Component {
                           <div id="success"></div>
                  <Text>
                     <h2>Here are your stored drinks:</h2>
-                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map((drink, i) => <div key={i}>{drink}</div>)}
+                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map((drink, i) => <div key={i}>{drink.name}</div>)}
                 </Text>
             </View>
         </ScrollView>
