@@ -70,6 +70,20 @@ export default class LinksScreen extends React.Component {
     this.setState({userName: undefined})
   }
 
+  handleStateChange = (user) => {
+    if(user) {
+      this.setState({user:user.uid})
+    }
+    else {
+      console.log("Not logged in")
+    }
+
+  }
+
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged(this.handleStateChange);
+  }
+
 
   render() {
     return (
@@ -163,7 +177,7 @@ const profileView = (username) => {
         <Text style={styles.infoText}><br/>HELLO {username}!<br/></Text>
 
         <Text style={styles.infoText}>Here are the drinks you have saved:</Text> 
-        <TabBarIcon name="ios-beer" />
+        {/* <TabBarIcon name="ios-beer" /> */}
 
           <TouchableOpacity
           style={styles.userButton}
