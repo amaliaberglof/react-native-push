@@ -172,7 +172,6 @@ export default class FindScreen extends React.Component {
 
     render(){
         let slice = this.state.stores.slice(0, 5);
-
         return (
         <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
@@ -203,7 +202,7 @@ export default class FindScreen extends React.Component {
                     <Button 
                         title="Add this drink!" 
                         onPress={() => {this.addDrink(this.state.currentDrink)}}
-                        disabled={this.state.user === undefined}
+                        disabled={this.state.user === undefined || this.state.currentDrink === undefined}
                     
                     />
                     

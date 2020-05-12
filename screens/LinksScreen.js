@@ -36,6 +36,7 @@ export default class LinksScreen extends React.Component {
       userDrinks: undefined,
       focusDrink: undefined,
       modalVisible: false,
+      deleteMode:false,
     }
   }
 
@@ -75,6 +76,7 @@ export default class LinksScreen extends React.Component {
   }
 
   getUserDrinks(){
+    console.log("called")
     if (this.state.user !== undefined) {
       //Lay connection with the database.
       var drinks = []
@@ -89,6 +91,15 @@ export default class LinksScreen extends React.Component {
     }   
 }
 
+deleteDrink() {
+  var filteredDrinks = this.state.userDrinks.filter(drink => drink.id !== this.state.focusDrink.id)
+  this.setState({userDrinks: filteredDrinks})
+  var db = firebase.firestore();
+  setTimeout(() => db.collection("users").doc(this.state.user).set({
+    drinks: this.state.userDrinks
+  }, {merge: true}).then(() => console.log("deleted")).catch(err => console.log(err)),1000)
+}
+
   handleStateChange = (user) => {
     if(user) {
       this.setState({user:user.uid})
@@ -101,7 +112,7 @@ export default class LinksScreen extends React.Component {
 
   }
 
-  componentDidMount() {
+  componentWillMount() {
     firebase.auth().onAuthStateChanged(this.handleStateChange);
   }
 
@@ -188,16 +199,22 @@ export default class LinksScreen extends React.Component {
 
                   <Text style={styles.infoText}><br/>HELLO {this.state.userName}!<br/></Text>
 
+                  {this.state.userDrinks === undefined || this.state.userDrinks.length === 0 ? 
+                  <Text style={styles.infoText}>You haven't saved any drinks.<br/>
+                  Begin by browsing the Find drink-tab.</Text>
+                  :
                   <Text style={styles.infoText}>Here are the drinks you have saved. 
-                  <br/>Click on the beer-icon to get more information!</Text> 
-                  {this.state.userDrinks === undefined? <div>You haven't saved any drinks</div> 
+                  <br/>Click on the beer-icon to get more information 
+                  <br/>about the drink. Long-hold to be able to delete.</Text> }
+                  {this.state.userDrinks === undefined? <div></div> 
                   : this.state.userDrinks.map((drink,index) => (
                     <div key={index}>
                     <Ionicons 
                       name="ios-beer"
                       size={30}
-                    onPress={() => this.setState({focusDrink:drink, modalVisible:true})}/>
-                    <Text style={styles.infoText} key={index}> {drink.name}</Text>
+                    onPress={() => this.setState({focusDrink:drink, modalVisible:true, deleteMode:true})}/>
+                    <Text onPress={() => this.setState({focusDrink:drink, deleteMode:true})}style={styles.infoText} key={index}> {drink.name}</Text>
+                    {this.state.deleteMode && this.state.focusDrink.name === drink.name ? <Ionicons onPress={() => this.deleteDrink()} name="md-trash" size={30}/> : <Text></Text>}
                   </div>))}
               </View>
               <TouchableOpacity
@@ -323,6 +340,7 @@ const styles = StyleSheet.create({
   },
   ProfileView: {
     flex:1,
+    width:'80%',
     margin:10,
     alignContent: 'center',
     alignItems: 'center',

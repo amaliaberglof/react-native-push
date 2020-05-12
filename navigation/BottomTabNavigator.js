@@ -10,10 +10,6 @@ const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
 
 
-import * as firebase from 'firebase/app';
-import 'firebase/auth';
-
-
 
 
 export default function BottomTabNavigator({ navigation, route,  }) {
@@ -23,7 +19,6 @@ export default function BottomTabNavigator({ navigation, route,  }) {
 
   // This us not current in use, since the header is hidden in App.js:
   navigation.setOptions({ headerTitle: getHeaderTitle(route) });
-
   return (
     
     <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
@@ -31,6 +26,7 @@ export default function BottomTabNavigator({ navigation, route,  }) {
         name="Home"
         component={HomeScreen}
         options={{
+          unmountOnBlur: true,
           title: 'Get Started',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-beer" />,
         }}
@@ -39,6 +35,7 @@ export default function BottomTabNavigator({ navigation, route,  }) {
         name="Find"
         component={FindScreen}
         options={{
+          unmountOnBlur: true,
           title: 'Find drink',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-home" />,
         }}
@@ -48,7 +45,8 @@ export default function BottomTabNavigator({ navigation, route,  }) {
         name="Links"
         component={LinksScreen}
         options={{
-          title: 'Din profil',
+          unmountOnBlur: true,
+          title: 'Your profile',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-person" />,
         }}
       />
