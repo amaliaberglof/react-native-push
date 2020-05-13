@@ -27,7 +27,6 @@ export default class LinksScreen extends React.Component {
   constructor() {
     super();
     this.state = {
-      user : undefined,
       login: false,
       buttonText:'',
       signup:false,
@@ -40,9 +39,9 @@ export default class LinksScreen extends React.Component {
     }
   }
 
-  addUserToDatabase(userID) {
+  addUserToDatabase() {
     const db = firebase.firestore()
-    db.collection("users").doc(userID).set({
+    db.collection("users").doc(this.props.user).set({
       username: 'Username'
     })
     .then(() => {
@@ -55,65 +54,56 @@ export default class LinksScreen extends React.Component {
   }
 
 
-  fetchUserName(userID) {
-    const db = firebase.firestore();
-    db.collection("users").doc(userID).get().then(doc => {
-        if(doc.exists) {
-              this.setState({userName: doc.data().username})
-        }
-        else {
-            console.log("No such user in database")
-        }
-    }).catch((err) => {
-        console.log(err)
-    })
+  fetchUserName() {
+    if(this.props.user !== undefined) {
+      const db = firebase.firestore();
+      db.collection("users").doc(this.props.user).get().then(doc => {
+          if(doc.exists) {
+                this.setState({userName: doc.data().username})
+          }
+          else {
+              console.log("No such user in database")
+          }
+      }).catch((err) => {
+          console.log(err)
+      })
+    }
+
   }
 
   LogOut() {
     firebase.auth().signOut();
-    this.setState({user: undefined})
     this.setState({userName: undefined})
   }
 
   getUserDrinks(){
-    console.log("called")
-    if (this.state.user !== undefined) {
+    if (this.props.user !== undefined) {
       //Lay connection with the database.
       var drinks = []
       var firestore = firebase.firestore();
-      var coll = firestore.collection("users").doc(this.state.user)
+      var coll = firestore.collection("users").doc(this.props.user)
       coll.get().then(doc => {
         if (doc.data().drinks !== undefined){
             doc.data().drinks.forEach(drink => drinks.push(drink))
             this.setState({userDrinks: drinks})
         }
       })
-    }   
+    }
+    
 }
 
 deleteDrink() {
   var filteredDrinks = this.state.userDrinks.filter(drink => drink.id !== this.state.focusDrink.id)
   this.setState({userDrinks: filteredDrinks})
   var db = firebase.firestore();
-  setTimeout(() => db.collection("users").doc(this.state.user).set({
+  setTimeout(() => db.collection("users").doc(this.props.user).set({
     drinks: this.state.userDrinks
   }, {merge: true}).then(() => console.log("deleted")).catch(err => console.log(err)),1000)
 }
 
-  handleStateChange = (user) => {
-    if(user) {
-      this.setState({user:user.uid})
-      this.fetchUserName(user.uid);
-      this.getUserDrinks();
-    }
-    else {
-      console.log("Not logged in")
-    }
-
-  }
-
-  componentWillMount() {
-    firebase.auth().onAuthStateChanged(this.handleStateChange);
+  componentDidMount() {
+    this.fetchUserName();
+    this.getUserDrinks();
   }
 
 
@@ -122,7 +112,7 @@ deleteDrink() {
       <View style={styles.container} contentContainerStyle={styles.contentContainer}>
 
         {/* VIEW 1 */}
-        {(this.state.user === undefined) ? 
+        {(this.props.user === undefined) ? 
 
         // To be displayed before the user logs in
         (this.state.buttonHide === true ? 
@@ -146,8 +136,7 @@ deleteDrink() {
                 const promise = auth.createUserWithEmailAndPassword(email,password)
                 promise
                 .then(user => {
-                  this.setState({user:user.user.uid})
-                  this.addUserToDatabase(user.user.uid)
+                  this.addUserToDatabase()
                 })
                   .catch(e => alert(e.message))
               }
@@ -158,10 +147,10 @@ deleteDrink() {
                 const promise = auth.signInWithEmailAndPassword(email,password)
                 promise
                 .then(user => {
-                  this.setState({user:user.user.uid})
-                  this.fetchUserName(user.user.uid)
+                  this.fetchUserName()
                 })
-                  .catch(e => alert(e.message))
+                  .catch(e => 
+                    console.log(e.message))
               }
             }}>
               

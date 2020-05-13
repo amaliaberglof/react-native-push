@@ -38,6 +38,8 @@ export default class FindScreen extends React.Component {
           this.getInventory = this.getInventory.bind(this);
           this.setPosition = this.setPosition.bind(this);
           this.getStore = this.getStore.bind(this);
+          this.getLocation();
+          this.getStores();
       }
 
 
@@ -58,13 +60,12 @@ export default class FindScreen extends React.Component {
       
 
       getUserDrinks(){
-        if (this.state.user !== undefined) {
+        if (this.props.user !== undefined) {
           //Lay connection with the database.
           var drinks = []
           var firestore = firebase.firestore();
-          var coll = firestore.collection("users").doc(this.state.user)
+          var coll = firestore.collection("users").doc(this.props.user)
           coll.get().then(doc => {
-            console.log(doc.data())
             if (doc.data().drinks !== undefined){
                 doc.data().drinks.forEach(drink => drinks.push(drink))
                 this.setState({userDrinks: drinks})
@@ -77,7 +78,7 @@ export default class FindScreen extends React.Component {
             this.setState({userDrinks: [...this.state.userDrinks, drink]})
 
             var firestore = firebase.firestore();
-            var drinksRef = firestore.collection("users").doc(this.state.user);
+            var drinksRef = firestore.collection("users").doc(this.props.user);
             var setWithMerge = drinksRef.set({
                 drinks: [...this.state.userDrinks, drink]
             }, { merge: true });
@@ -124,29 +125,16 @@ export default class FindScreen extends React.Component {
 
       getSingleDrink() {
         if(this.state.storeItems.length > 0) {
-          console.log(this.state.storeItems)
           var singledrink = this.state.storeItems[Math.floor(Math.random() * (this.state.storeItems.length))]
           var singledrinkInfo = {...singledrink, location:this.state.closestStore}
           this.setState({currentDrink: singledrinkInfo, currentDrinkName: singledrinkInfo.name})
         }
       }
 
-      handleStateChange = (user) => {
-        if(user) {
-          this.setState({user:user.uid})
-          this.getUserDrinks();
-        }
-        else {
-          console.log("Not logged in")
-        }
-    
-      }
-    
       componentDidMount() {
-        this.getLocation();
-        this.getStores();
-        firebase.auth().onAuthStateChanged(this.handleStateChange);
+        this.getUserDrinks();
       }
+  
       
       deviceOrientationListener(event) {
         // Future:
@@ -202,7 +190,7 @@ export default class FindScreen extends React.Component {
                     <Button 
                         title="Add this drink!" 
                         onPress={() => {this.addDrink(this.state.currentDrink)}}
-                        disabled={this.state.user === undefined || this.state.currentDrink === undefined}
+                        disabled={this.props.user === undefined || this.state.currentDrink === undefined}
                     
                     />
                     
