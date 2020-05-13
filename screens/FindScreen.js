@@ -36,8 +36,11 @@ export default class FindScreen extends React.Component {
             userDrinks: [],
             currentDrink: undefined,
             errMessage: undefined,
+            sorryMessage: undefined,
             storeCoords: undefined
           };
+          this.getRandomStore = this.getRandomStore.bind(this)
+          this.getRandomInventory = this.getRandomInventory.bind(this)
           this.getInventory = this.getInventory.bind(this);
           this.setPosition = this.setPosition.bind(this);
           this.getStore = this.getStore.bind(this);
@@ -90,14 +93,15 @@ export default class FindScreen extends React.Component {
       getLocation() {
         if (navigator.geolocation) {
             console.log("Geolocation supported")
-          navigator.geolocation.getCurrentPosition(this.setPosition);
+              navigator.geolocation.getCurrentPosition(this.setPosition, this.getRandomStore);
         } else { 
-          // TODO: ändra så detta skrivs ut synligt för användaren, istället för i consolen
           console.log("Geolocation is not supported by this browser.");
         }
       }
   
       setPosition(position) {
+        if(position.coords !== undefined) {
+          document.getElementById("sorryMessage").innerHTML = "";
           console.log(position.coords)
         this.setState({
           userLatitude: position.coords.latitude,
@@ -105,12 +109,38 @@ export default class FindScreen extends React.Component {
         })
         this.getStore(0);
       }
+      }
   
       getStores(){
           getStoresInCity('stockholm').then(data=> this.setState({stores: data.items})).catch(err => {
             console.log(err)
             this.setState({errMessage: 'There was an error with the API :( Try again!'})
           })
+      }
+
+      getRandomStore() {
+        getStoresInCity('stockholm').then(data=> {
+          var randomStore = data.items[Math.floor(Math.random() * (data.items.length))]
+          this.setState({
+            storeCoords: {lat: parseFloat(randomStore.lat), lng: parseFloat(randomStore.lng)},
+            closestStore: randomStore.address,
+            storeId: randomStore.id
+        })
+      }).then(() => this.getRandomInventory(this.state.storeId)).catch(err => {
+        console.log(err)
+        this.setState({errMessage: 'There was an error with the API :( Try again!'})
+      })
+        
+      }
+
+      getRandomInventory(storeId) {
+        getStoreInventory(storeId).then(data => {
+          (data != undefined) ? (this.setState({storeItems:data.items}), this.getSingleDrink())
+          : this.getRandomStore();
+        }).catch(err => {
+          console.log(err)
+          this.setState({errMessage: 'There was an error with the API :( Try again!'})
+        })
       }
   
       getStore(index){
@@ -189,9 +219,8 @@ export default class FindScreen extends React.Component {
             onPress={() => {this.getLocation()
             }}
             /> */}
-
-
             <div id="position"></div>
+            <div id="sorryMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>We're sorry! We can't find your location. We'll randomize a store for you!</div>
                 
                 <Text style={styles.infoText}>
                     {/* <h2>Here's some stores in Stockholm</h2>

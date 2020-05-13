@@ -31,7 +31,6 @@ export default class LinksScreen extends React.Component {
       buttonText:'',
       signup:false,
       buttonHide:false,
-      userName: undefined,
       userDrinks: undefined,
       focusDrink: undefined,
       modalVisible: false,
@@ -41,11 +40,8 @@ export default class LinksScreen extends React.Component {
 
   addUserToDatabase() {
     const db = firebase.firestore()
-    db.collection("users").doc(this.props.user).set({
-      username: 'Username'
-    })
+    db.collection("users").doc(this.props.user)
     .then(() => {
-        this.setState({userName: 'Username'})
         console.log("Document written")
     })
     .catch((err) => {
@@ -54,26 +50,8 @@ export default class LinksScreen extends React.Component {
   }
 
 
-  fetchUserName() {
-    if(this.props.user !== undefined) {
-      const db = firebase.firestore();
-      db.collection("users").doc(this.props.user).get().then(doc => {
-          if(doc.exists) {
-                this.setState({userName: doc.data().username})
-          }
-          else {
-              console.log("No such user in database")
-          }
-      }).catch((err) => {
-          console.log(err)
-      })
-    }
-
-  }
-
   LogOut() {
     firebase.auth().signOut();
-    this.setState({userName: undefined})
   }
 
   getUserDrinks(){
@@ -83,9 +61,11 @@ export default class LinksScreen extends React.Component {
       var firestore = firebase.firestore();
       var coll = firestore.collection("users").doc(this.props.user)
       coll.get().then(doc => {
-        if (doc.data().drinks !== undefined){
+        if(doc.exists) {
+          if (doc.data().drinks !== undefined){
             doc.data().drinks.forEach(drink => drinks.push(drink))
             this.setState({userDrinks: drinks})
+        }
         }
       })
     }
@@ -102,7 +82,6 @@ deleteDrink() {
 }
 
   componentDidMount() {
-    this.fetchUserName();
     this.getUserDrinks();
   }
 
@@ -146,9 +125,6 @@ deleteDrink() {
                 const auth = firebase.auth();
                 const promise = auth.signInWithEmailAndPassword(email,password)
                 promise
-                .then(user => {
-                  this.fetchUserName()
-                })
                   .catch(e => 
                     console.log(e.message))
               }
@@ -197,7 +173,7 @@ deleteDrink() {
         
                  <Image source={require('../assets/images/avatar2.png')} style={styles.avatarImage}/>
 
-                  <Text style={styles.infoText}><br/>HELLO {this.state.userName}!<br/></Text>
+                  <Text style={styles.infoText}><br/>HELLO!<br/></Text>
 
                   {this.state.userDrinks === undefined || this.state.userDrinks.length === 0 ? 
                   <Text style={styles.infoText}>You haven't saved any drinks.<br/>

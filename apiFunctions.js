@@ -24,7 +24,6 @@ function getClosestStore(lat, lng){
 }
 
 function getStoreInventory(id){
-    console.log(id)
     return fetch('https://cors-anywhere.herokuapp.com/https://systembevakningsagenten.se/api/json/1.0/inventoryForStore.json?' + new URLSearchParams({
         id: id 
     }), {method: "GET"})             
