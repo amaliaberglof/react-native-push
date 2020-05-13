@@ -15,28 +15,27 @@ export default class HomeScreen extends React.Component {
 
                   <Image source={require('../assets/images/frontpagelogo.png')} style={styles.logoImage}/>
                   
-                  <Text style={styles.infoText}>
-                    <br />
-                    Såhär funkar det:
-                    <ul>
-                    <li>När du klickar på starta kommer appen hitta ditt närmsta systembolag</li>
-                    <li>En rekommendation på dryck från detta bolag kommer dyka upp</li>
-                    <li>Tycker du inte om rekomendationen kan du snurra din telefon 360°, så får du ett nytt förslag</li>
-                    <li>Logga in eller skapa en profil för att spara dina förslag</li>
-                    </ul>
-                  </Text> 
+                  <Text style={styles.infoText}>En trevlig text som förklarar vår app :))</Text>
+                  {/* <Text style={styles.infoText}>Looking for a drink to buy?</Text>
+                  <Text style={styles.centerText}>First of all, let us find the closest Systembolag with an inventory for you. Then we will suggest a drink within that inventory. 
+                    <br/>
+                    <br/>Want another drink? Just spin your phone 360° and we will provide you with a new suggestion. 
+                    <br/>
+                    <br/>Don't forget to save your favorite drinks to your profile! 
+                    </Text>
+                  <Text style={styles.infoText}><br/>Ready?<br/></Text> */}
 
                   <Button onPress={() => 
                     {this.props.navigation.navigate('Find')
                     }}
-                    title="STARTA">
+                    title="FIND ME A DRINK">
                   </Button>
 
-                  <Text style={styles.helpLinkText}
+                  {/* <Text style={styles.helpLinkText}
                    onPress={() =>this.props.navigation.navigate('Links')}>
-                    {this.props.user === undefined? <div>Eller <u>logga in</u> för att se dina sparade förslag</div>:
-                    <u>Gå till din profil</u>}
-                  </Text>
+                    {this.props.user === undefined? <div>Or <u>sign in</u> to see your saved suggestions</div>:
+                    <u>Show my profile</u>}
+                  </Text> */}
                   <Image source={require('../assets/images/frontpageimg.png')} style={styles.bottomImage}/>
 
               </View>
@@ -107,6 +106,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'rgba(96,100,109, 1)',
     textAlign: 'left',
+  },
+  centerText:{
+    textAlign: 'center'
   },
   helpLinkText: {
     fontSize: 14,

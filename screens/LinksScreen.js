@@ -49,7 +49,6 @@ export default class LinksScreen extends React.Component {
     })
   }
 
-
   LogOut() {
     firebase.auth().signOut();
   }
@@ -192,6 +191,7 @@ deleteDrink() {
                     <Text onPress={() => this.setState({focusDrink:drink, deleteMode:true})}style={styles.infoText} key={index}> {drink.name}</Text>
                     {this.state.deleteMode && this.state.focusDrink.name === drink.name ? <Ionicons onPress={() => this.deleteDrink()} name="md-trash" size={30}/> : <Text></Text>}
                   </div>))}
+                  
               </View>
               <TouchableOpacity
                 style={styles.userButton}
@@ -201,6 +201,8 @@ deleteDrink() {
                 <Text style={styles.userButtonText}>Log out</Text>
               </TouchableOpacity>
               {this.state.modalVisible ?
+            
+            // The pop-up window for the drink
             <View 
             onTouchEndCapture
             ={() => this.setState({modalVisible:false})}
@@ -210,12 +212,18 @@ deleteDrink() {
                   <Text
                   onPress={() => this.setState({modalVisible:false})}
                   style={styles.closeModalText}>X</Text></View>
+              
+              {/* Content */}
+              <Image source={require('../assets/images/beer.png')} style={styles.beerLogo}/>
               <Text style={styles.drinkHeader}>{this.state.focusDrink.name}</Text>
               <View style={styles.drinkInfo}>
-                <Text>Found at {this.state.focusDrink.location}</Text>
-              <Text>Cost: {this.state.focusDrink.price} SEK | Alc.: {this.state.focusDrink.alcohol_vol}%</Text>
-              <Text>Country: {this.state.focusDrink.country} | Producer: {this.state.focusDrink.producer}</Text>
-              {this.state.focusDrink.items < 15 ? <Text>This item is almost out of stock!</Text>:<Text>You don't need to rush - there's a lot of this drink at the store</Text>}
+                <Text style={styles.boldText}>Found at {this.state.focusDrink.location}</Text>
+                
+                {this.state.focusDrink.items < 15 ? <Text>This item is almost out of stock!<br/><br/></Text>:<Text style={styles.centerText}>You don't need to rush - there's a lot of this drink at the store<br/><br/></Text>}
+                
+                <Text>Cost: {this.state.focusDrink.price} SEK | Alc.: {this.state.focusDrink.alcohol_vol}% | APK: {(this.state.focusDrink.alcohol_vol/this.state.focusDrink.price).toFixed(2)} <br/><br/></Text>
+                <Text style={styles.centerText}>Country: {this.state.focusDrink.country} | Producer: {this.state.focusDrink.producer}<br/><br/></Text>
+                
               </View>
               </View>
             </View> :<div></div>}
@@ -289,8 +297,14 @@ const styles = StyleSheet.create({
     margin: 5,
     color: 'black',
   },
+  boldText:{
+    fontWeight: 'bold'
+  },
+  centerText:{
+    textAlign: 'center'
+  },
   myButton: {
-    backgroundColor: "#52c8f7",
+    backgroundColor: "#429f46",
     borderRadius: 10,
     width:80,
     height:40,
@@ -305,7 +319,7 @@ const styles = StyleSheet.create({
     width:150,
     height:50,
     margin:5,
-    backgroundColor: '#52f7a7',
+    backgroundColor: '#429f46',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10
@@ -338,13 +352,20 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginTop: 1,
     marginBottom: 0,
-    marginLeft: -10,  },
+    marginLeft: -10,  
+  },
+  beerLogo: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
+    margin: 'auto'
+  },
 
   modal: {
     display: 'block',
     position: 'fixed', /* Stay in place */
     zIndex: 1, /* Sit on top */
-    paddingTop: 100, /* Location of the box */
+    paddingTop: 30, /* Location of the box */
     left: 0,
     top: 0,
     bottom: 0,
