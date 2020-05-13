@@ -7,6 +7,7 @@ import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
 import {getStoresInCity, getClosestStore, getStoreInventory} from '../apiFunctions'
 import GoogleMapReact from 'google-map-react';
+import './Marker.css';
 
 import 'firebase/auth';
 
@@ -21,6 +22,16 @@ const config = {
     messagingSenderId: "504646558883",
     appId: "1:504646558883:web:7426365e9266368d654b16",
     measurementId: "G-FCM6BTPP6X"
+  };
+
+  const Marker = (props) => {
+    const { color, name, id } = props;
+    return (
+      <div className="marker"
+        style={{ backgroundColor: color, cursor: 'pointer'}}
+        title={name}
+      />
+    );
   };
 
 export default class FindScreen extends React.Component {
@@ -226,7 +237,8 @@ export default class FindScreen extends React.Component {
             /> */}
             <div id="position"></div>
             <div id="sorryMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>We're sorry! We can't find your location. We'll randomize a store for you!</div>
-            {this.state.storeCoords === undefined? undefined : <div style={{ height: '30vh', width: '100%', margin: ''}}>
+            {this.state.storeCoords === undefined? undefined : 
+                <div style={{ height: '30vh', width: '100%', margin: ''}}>
                           <GoogleMapReact
                               //bootstrapURLKeys={{ key: /* YOUR KEY HERE */ }}
                               defaultCenter={{
@@ -235,8 +247,14 @@ export default class FindScreen extends React.Component {
                               }}
                               defaultZoom={16}
                           >
+                            <Marker
+                                lat={this.state.storeCoords.lat}
+                                lng={this.state.storeCoords.lng}
+                                name={this.state.closestStore}
+                                color="red"
+                            />
                           </GoogleMapReact>
-             </div>}
+                </div>}
                 
                 <Text style={styles.infoText}>
 
