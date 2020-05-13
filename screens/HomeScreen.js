@@ -15,15 +15,7 @@ export default class HomeScreen extends React.Component {
 
                   <Image source={require('../assets/images/frontpagelogo.png')} style={styles.logoImage}/>
                   
-                  <Text style={styles.infoText}>En trevlig text som förklarar vår app :))</Text>
-                  {/* <Text style={styles.infoText}>Looking for a drink to buy?</Text>
-                  <Text style={styles.centerText}>First of all, let us find the closest Systembolag with an inventory for you. Then we will suggest a drink within that inventory. 
-                    <br/>
-                    <br/>Want another drink? Just spin your phone 360° and we will provide you with a new suggestion. 
-                    <br/>
-                    <br/>Don't forget to save your favorite drinks to your profile! 
-                    </Text>
-                  <Text style={styles.infoText}><br/>Ready?<br/></Text> */}
+                  <Text style={styles.infoText}>Don't know what to drink? No worries! We will find your closest <i>Systembolag</i> and suggest a delicious beverage available there. </Text>
 
                   <Button onPress={() => 
                     {this.props.navigation.navigate('Find')
@@ -31,16 +23,12 @@ export default class HomeScreen extends React.Component {
                     title="FIND ME A DRINK">
                   </Button>
 
-                  {/* <Text style={styles.helpLinkText}
-                   onPress={() =>this.props.navigation.navigate('Links')}>
-                    {this.props.user === undefined? <div>Or <u>sign in</u> to see your saved suggestions</div>:
-                    <u>Show my profile</u>}
-                  </Text> */}
-                  <Image source={require('../assets/images/frontpageimg.png')} style={styles.bottomImage}/>
 
               </View>
-
             </ScrollView>
+            
+            <Image source={require('../assets/images/frontpageimg.png')} style={styles.bottomImage}/>
+
 
           </View>
         )
@@ -75,8 +63,10 @@ const styles = StyleSheet.create({
     marginLeft: -10,
   },
   bottomImage: {
-    width: 500,
+    width: '100%',
     height: 200,
+    position: 'absolute',
+    bottom:0,
     marginLeft: 0,
     paddingLeft: 0,
     resizeMode: 'contain',
@@ -105,7 +95,8 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 18,
     color: 'rgba(96,100,109, 1)',
-    textAlign: 'left',
+    textAlign: 'center',
+    margin: '20px'
   },
   centerText:{
     textAlign: 'center'

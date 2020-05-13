@@ -226,7 +226,7 @@ export default class FindScreen extends React.Component {
         <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
             <Text style={styles.headerText}>
-                Hitta närmsta Systembolag
+                Find closest Systembolag
             </Text>
 
             <View style={styles.infoContainer}>
@@ -299,29 +299,6 @@ export default class FindScreen extends React.Component {
         )
     }
   }
-  // function deviceOrientationListener(event) {
-  //   // Future:
-  //   //var neededDirection = Math.floor(Math.random() * 360);
-  //   var neededDirection = 60;
-  //   document.getElementById("directionNeeded").innerHTML = "Your phone needs to be in direction: " + neededDirection;
-
-  //   var alpha   = event.alpha; //z axis rotation [0,360)
-  //   var beta     = event.beta; //x axis rotation [-180, 180]
-  //   var gamma   = event.gamma; //y axis rotation [-90, 90]
-
-  //   //Check if absolute values have been sent
-  //   if (typeof event.webkitCompassHeading !== "undefined") {
-  //     alpha = event.webkitCompassHeading; //for iOS devices
-  //     var heading = alpha
-  //   }
-  //   document.getElementById("direction").innerHTML = "Your phone is currently in direction: " + Math.floor(alpha);
-  //   if( Math.floor(alpha)==neededDirection){
-  //     document.getElementById("success").innerHTML = "Success!";
-  //     FindScreen.getSingleDrink();
-
-  //   }
-  // }
-    
 
   const styles = StyleSheet.create({
     container: {
