@@ -7,6 +7,7 @@ import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
 import {getStoresInCity, getClosestStore, getStoreInventory} from '../apiFunctions'
 import GoogleMapReact from 'google-map-react';
+import './Marker.css';
 
 import 'firebase/auth';
 
@@ -21,6 +22,16 @@ const config = {
     messagingSenderId: "504646558883",
     appId: "1:504646558883:web:7426365e9266368d654b16",
     measurementId: "G-FCM6BTPP6X"
+  };
+
+  const Marker = (props) => {
+    const { color, name, id } = props;
+    return (
+      <div className="marker"
+        style={{ backgroundColor: color, cursor: 'pointer'}}
+        title={name}
+      />
+    );
   };
 
 export default class FindScreen extends React.Component {
@@ -38,6 +49,7 @@ export default class FindScreen extends React.Component {
             errMessage: undefined,
             storeCoords: undefined,
             neededDirection: 0,
+            done:false,
           };
           this.getRandomStore = this.getRandomStore.bind(this)
           this.getRandomInventory = this.getRandomInventory.bind(this)
@@ -176,6 +188,7 @@ export default class FindScreen extends React.Component {
           var singledrinkInfo = {...singledrink, location:this.state.closestStore}
           this.setState({currentDrink: singledrinkInfo, currentDrinkName: singledrinkInfo.name})
           this.setState({neededDirection: Math.floor(Math.random() * 360)});
+          this.setState({done:true})
         }
 
       }
@@ -225,7 +238,10 @@ export default class FindScreen extends React.Component {
             /> */}
             <div id="position"></div>
             <div id="sorryMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>We're sorry! We can't find your location. We'll randomize a store for you!</div>
-            {this.state.storeCoords === undefined? undefined : <div style={{ height: '30vh', width: '100%', margin: ''}}>
+            <div style={{ height: '30vh', width: '100%', margin: ''}}>
+              {!this.state.done ? <img style={{width:'20%', textAlign:'center', marginLeft:'40%', marginTop:'20%', alignContent:'center', alignSelf: 'center', display:'inline-block'}}
+              src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/35771931234507.564a1d2403b3a.gif"/> : 
+                this.state.storeCoords !== undefined ?
                           <GoogleMapReact
                               //bootstrapURLKeys={{ key: /* YOUR KEY HERE */ }}
                               defaultCenter={{
@@ -234,22 +250,29 @@ export default class FindScreen extends React.Component {
                               }}
                               defaultZoom={16}
                           >
+                            <Marker
+                                lat={this.state.storeCoords.lat}
+                                lng={this.state.storeCoords.lng}
+                                name={this.state.closestStore}
+                                color="red"
+                            />
                           </GoogleMapReact>
-             </div>}
+                :<div></div>}
+                </div>
                 
                 <Text style={styles.infoText}>
 
-                    <h2>This is your closest store: (With an inventory)</h2>
+                  {this.state.done ?<h2>This is your closest store: (With an inventory)</h2> :undefined }
                         <div>{this.state.closestStore}</div>
 
-                    <h2>Here's a drink from that store:</h2>
+                    {this.state.done ? <h2>Here's a drink from that store:</h2>:<div></div>}
                     <View style={styles.suggestionRowItem}>
 
                       {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrinkName}</div>}
                       </View>
                       <View style={styles.suggestionRowItem}>
-                        <Button title="SAVE"  onPress={() => {this.addDrink(this.state.currentDrink), document.getElementById("confirmMessage").innerHTML = this.state.currentDrinkName +  " added!";
-                                          }} disabled={this.props.user === undefined || this.state.currentDrink === undefined} />
+                        {this.state.done ?<Button title="SAVE"  onPress={() => {this.addDrink(this.state.currentDrink), document.getElementById("confirmMessage").innerHTML = this.state.currentDrinkName +  " added!";
+                                          }} disabled={this.props.user === undefined || this.state.currentDrink === undefined} />:undefined}
                                               
                       </View>
                       <div id="confirmMessage" style={{color: 'grey', fontStyle: 'italic'}}></div>     
