@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Button, Image, Platform, Dimensions, componentDidMount } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, Platform, Dimensions, componentDidMount, Alert } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
@@ -33,7 +33,8 @@ export default class FindScreen extends React.Component {
             userLatitude: 0,
             userLongitude: 0,
             userDrinks: [],
-            currentDrink: undefined
+            currentDrink: undefined,
+            errMessage: undefined
           };
           this.getInventory = this.getInventory.bind(this);
           this.setPosition = this.setPosition.bind(this);
@@ -103,7 +104,10 @@ export default class FindScreen extends React.Component {
       }
   
       getStores(){
-          getStoresInCity('stockholm').then(data=> this.setState({stores: data.items}))
+          getStoresInCity('stockholm').then(data=> this.setState({stores: data.items})).catch(err => {
+            console.log(err)
+            this.setState({errMessage: 'There was an error with the API :( Try again!'})
+          })
       }
   
       getStore(index){
@@ -112,15 +116,22 @@ export default class FindScreen extends React.Component {
           .then(data=> this.setState({
               closestStore: data.items[index].address,
               storeId: data.items[index].id
-          }, () => this.getInventory(index)))
+          }, () => this.getInventory(index))).catch(err => {
+            console.log(err)
+            this.setState({errMessage: 'There was an error with the API :( Try again!'})
+          })
       }
   
       getInventory(index){
           getStoreInventory(this.state.storeId).then(data => 
-              (data != undefined) ? (this.setState({storeItems: data.items}), this.getSingleDrink()) :
+              (data != undefined) ? (this.setState({storeItems: data.items}), this.getSingleDrink())
+               :
               this.getStore(index + 1)
               )   //if the store inventory is undefined, take the next store
-
+              .catch(err => {
+                console.log(err)
+                this.setState({errMessage: 'There was an error with the API :( Try again!'})
+              })
       }
 
       getSingleDrink() {
@@ -210,6 +221,9 @@ export default class FindScreen extends React.Component {
                 </Text>
             </View>
         </ScrollView>
+        {this.state.errMessage !== undefined ? Alert.alert(
+          "Oops", this.state.errMessage, { cancelable: false }
+        ):<div></div>}
         </View>
         
         )

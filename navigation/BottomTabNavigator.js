@@ -74,7 +74,7 @@ export default function BottomTabNavigator({ navigation, route,  }) {
 
       {user === undefined && <BottomTab.Screen
         name="Links"
-        component={LinksScreen}
+        component={(props) => <LinksScreen {...props} user={user}/>}
         options={{
           unmountOnBlur: true,
           title: 'Log in',
