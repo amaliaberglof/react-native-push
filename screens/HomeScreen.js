@@ -22,12 +22,9 @@ export default class HomeScreen extends React.Component {
                     }}
                     title="FIND ME A DRINK">
                   </Button>
-
-
               </View>
             </ScrollView>
-            
-            <Image source={require('../assets/images/frontpageimg.png')} style={styles.bottomImage}/>
+           <Image source={require('../assets/images/frontpageimg.png')} style={styles.bottomImage}/>
 
 
           </View>

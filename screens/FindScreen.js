@@ -48,7 +48,8 @@ export default class FindScreen extends React.Component {
             currentDrink: undefined,
             errMessage: undefined,
             storeCoords: undefined,
-            neededDirection: 0
+            neededDirection: 0,
+            done:false,
           };
           this.getRandomStore = this.getRandomStore.bind(this)
           this.getRandomInventory = this.getRandomInventory.bind(this)
@@ -187,7 +188,7 @@ export default class FindScreen extends React.Component {
           var singledrinkInfo = {...singledrink, location:this.state.closestStore}
           this.setState({currentDrink: singledrinkInfo, currentDrinkName: singledrinkInfo.name})
           this.setState({neededDirection: Math.floor(Math.random() * 360)});
-
+          this.setState({done:true})
         }
 
       }
@@ -226,19 +227,16 @@ export default class FindScreen extends React.Component {
         <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
             <Text style={styles.headerText}>
-                Find closest Systembolag
+                Find closest
             </Text>
 
             <View style={styles.infoContainer}>
-            {/* <Button 
-            title="FIND CLOSEST"
-            onPress={() => {this.getLocation()
-            }}
-            /> */}
             <div id="position"></div>
             <div id="sorryMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>We're sorry! We can't find your location. We'll randomize a store for you!</div>
-            {this.state.storeCoords === undefined? undefined : 
-                <div style={{ height: '30vh', width: '100%', margin: ''}}>
+            <div style={{ height: '30vh', width: '100%', margin: ''}}>
+              {!this.state.done ? <img style={{width:'20%', textAlign:'center', marginLeft:'40%', marginTop:'20%', alignContent:'center', alignSelf: 'center', display:'inline-block'}}
+              src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/35771931234507.564a1d2403b3a.gif"/> : 
+                this.state.storeCoords !== undefined ?
                           <GoogleMapReact
                               //bootstrapURLKeys={{ key: /* YOUR KEY HERE */ }}
                               defaultCenter={{
@@ -254,30 +252,34 @@ export default class FindScreen extends React.Component {
                                 color="red"
                             />
                           </GoogleMapReact>
-                </div>}
-                
+                :<div></div>}
+                </div>
+                {this.state.done ? <View style={{display:`${this.state.done}`, backgroundColor: '#C3E3FB', borderRadius: '25px', padding: '1em',margin: '1em', marginBottom: 0, marginTop: '0.5em'}}>
                 <Text style={styles.infoText}>
 
-                    <h2>This is your closest store: (With an inventory)</h2>
-                        <div>{this.state.closestStore}</div>
+                
 
-                    <h2>Here's a drink from that store:</h2>
+                    {this.state.done ?<Text><Text style={styles.drinkText}>This is your closest store (with an inventory):</Text> {this.state.closestStore}</Text> :undefined }
+
+                    {this.state.done ? <Text style={styles.drinkText, {display:'block'}}><b>Here's what we found for you!</b></Text>:<div></div>}
                     <View style={styles.suggestionRowItem}>
 
                       {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrinkName}</div>}
                       </View>
                       <View style={styles.suggestionRowItem}>
-                        <Button title="SAVE"  onPress={() => {this.addDrink(this.state.currentDrink), document.getElementById("confirmMessage").innerHTML = this.state.currentDrinkName +  " added!";
-                                          }} disabled={this.props.user === undefined || this.state.currentDrink === undefined} />
+                        {this.state.done ?<Button title="SAVE"  onPress={() => {this.addDrink(this.state.currentDrink), document.getElementById("confirmMessage").innerHTML = this.state.currentDrinkName +  " added!";
+                                          }} disabled={this.props.user === undefined || this.state.currentDrink === undefined} />:undefined}
                                               
                       </View>
                       <div id="confirmMessage" style={{color: 'grey', fontStyle: 'italic'}}></div>     
                   
                       </Text>
+                      </View>:undefined}
                       <View style={styles.directions}>
-                      <h2 style={{fontFamily: 'Helvetica, arial, sans-serif'}}>Get a new suggestion:</h2>
+                      <Text style={{fontFamily: 'Helvetica, arial, sans-serif', fontSize: 20, fontWeight:'bold'}}
+                      onPress={() => this.getSingleDrink()}>Get a new suggestion</Text>
 
-                        <div id="errorMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>No device orientation found :( You need device orientation to get a new suggestions.</div>
+                        <div id="errorMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>No device orientation found :( You need device orientation to get a new suggestion. Click the title above instead!</div>
                         <Text>
                         <div id="directionNeeded" style={{fontFamily: 'Helvetica, arial, sans-serif'}}></div>
 
@@ -288,7 +290,6 @@ export default class FindScreen extends React.Component {
                           </Text>
                         </View>
                       </View>
-
             </View>
         </ScrollView>
         {this.state.errMessage !== undefined ? Alert.alert(
@@ -339,7 +340,7 @@ export default class FindScreen extends React.Component {
     },
     suggestionRowItem: {
       // float: 'left',
-      margin: '10px',
+      margin: '5px',
     },
     overlay: {
       display:'block',
@@ -371,6 +372,10 @@ export default class FindScreen extends React.Component {
     padding: '0.8em',
     margin: '0.3em',
 
+  },
+  drinkText: {
+    fontSize:'15px',
+    fontWeight: 'bold'
   }
 
 

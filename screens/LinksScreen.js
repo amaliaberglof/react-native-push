@@ -166,21 +166,24 @@ deleteDrink() {
           :
           // VIEW 2
           // PROFILE PAGE:
-            (
-            <View style={styles.Wrapper}>
-              <View style={styles.ProfileView}>
-        
-                 <Image source={require('../assets/images/avatar2.png')} style={styles.avatarImage}/>
+            ( 
+              <View style={styles.container}>
+              <Image source={require('../assets/images/avatar2.png')} style={styles.avatarImage}/>
 
-                  <Text style={styles.infoText}><br/>HELLO!<br/></Text>
+              <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+              <View style={styles.infoContainer}>
+                
+                  <Text style={styles.infoText}>HELLO!<br/></Text>
 
                   {this.state.userDrinks === undefined || this.state.userDrinks.length === 0 ? 
                   <Text style={styles.infoText}>You haven't saved any drinks.<br/>
                   Begin by browsing the Find drink-tab.</Text>
                   :
+                  <View>
                   <Text style={styles.infoText}>Here are the drinks you have saved. 
-                  <br/>Tap on the beer-icon to get more information 
-                  <br/>about the drink. Tap the drink to be able to delete.</Text> }
+                  <br/></Text>
+                  <Text style={styles.infoBox}><Ionicons name="ios-information-circle" size={16} /> Tap on the beer-icon to get more information 
+                  <br/>about the drink. Tap the drink to be able to delete.</Text></View> }
                   {this.state.userDrinks === undefined? <div></div> 
                   : this.state.userDrinks.map((drink,index) => (
                     <div key={index}>
@@ -191,8 +194,9 @@ deleteDrink() {
                     <Text onPress={() => this.setState({focusDrink:drink, deleteMode:true})}style={styles.infoText} key={index}> {drink.name}</Text>
                     {this.state.deleteMode && this.state.focusDrink.name === drink.name ? <Ionicons onPress={() => this.deleteDrink()} name="md-trash" size={30}/> : <Text></Text>}
                   </div>))}
-                  
               </View>
+              </ScrollView>
+
               <TouchableOpacity
                 style={styles.userButton}
                 onPress={() => {
@@ -255,8 +259,8 @@ function OptionButton({ icon, label, onPress, isLastOption }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     backgroundColor: '#fbfbfb',
+    paddingTop: 20
   },
   contentContainer: {
     paddingTop: 0,
@@ -287,8 +291,8 @@ const styles = StyleSheet.create({
     }),
     alignItems: 'center',
     backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-    margin:40,
+    paddingVertical: 0,
+    margin:0,
   },
   infoText: {
     fontSize: 18,
@@ -296,6 +300,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 5,
     color: 'black',
+  },
+  infoBox:{
+    fontSize: 12,
+    backgroundColor: 'lightblue',
+    padding: 15,
+    margin: 10,
+    borderRadius: 10,
   },
   boldText:{
     fontWeight: 'bold'
@@ -305,7 +316,7 @@ const styles = StyleSheet.create({
   },
   myButton: {
     backgroundColor: "#429f46",
-    borderRadius: 10,
+    borderRadius: 5,
     width:80,
     height:40,
     alignItems:'center',
@@ -316,17 +327,20 @@ const styles = StyleSheet.create({
     fontSize:20
   },
   userButton: {
-    width:150,
-    height:50,
-    margin:5,
+    width:80,
+    height:40,
+    margin: 'auto',
+    marginTop: 5,
+    marginBottom: 3,
     backgroundColor: '#429f46',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 10
+    borderRadius: 5
   },
   userButtonText: {
-    fontSize: 30,
-    color: 'white'
+    fontSize: 20,
+    color: 'white',
+    alignItems: 'center',
   },
   ProfileView: {
     flex:1,
@@ -347,12 +361,10 @@ const styles = StyleSheet.create({
 
   },
   avatarImage: {
-    width: 900,
+    width: 200,
     height: 200,
     resizeMode: 'contain',
-    marginTop: 1,
-    marginBottom: 0,
-    marginLeft: -10,  
+    margin: 'auto',  
   },
   beerLogo: {
     width: 200,
