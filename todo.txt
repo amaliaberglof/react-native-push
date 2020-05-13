@@ -1,10 +1,12 @@
-*Skaka mobilen
-* deploya (Amalia) *** KLAR
-* Hämta användarens koordinater (Johanna) ******KLAR
-*Flytta API-grejer från home till find-screen ******KLAR
-* lägga in user i databas (Amalia) ***** KLAR
-* lägg till en user-view om user är definierad (Johanna)
-*Visualisera Systembolagen i närheten på en Google-Maps-karta (lägre prio)
-* Inventory hämtas från en specifik Systemet nu, måste anpassa sig efter användarens closest store ********KLAR
-* Vissa Systemet har ej inventories (undefined), ta nästa Sytemet isf *********KLAR
-* Session management **** Klar
+* Fixa deviceOrientation-funktionen för ny drink (Johanna)
+ *** KLAR deploya (Amalia) *** KLAR
+ *** KLAR Hämta användarens koordinater (Johanna) ******KLAR
+ *** KLARFlytta API-grejer från home till find-screen ******KLAR
+ *** KLAR lägga in user i databas (Amalia) ***** KLAR
+ *** KLAR lägg till en user-view om user är definierad (Johanna)
+Visualisera Systembolagen i närheten på en Google-Maps-karta (lägre prio)
+ *** KLAR Inventory hämtas från en specifik Systemet nu, måste anpassa sig efter användarens closest store ********KLAR
+ *** KLAR Vissa Systemet har ej inventories (undefined), ta nästa Sytemet isf *********KLAR
+ *** KLAR Session management **** Klar
+ Fixa felmeddelanden synliga för anvädaren, (i getLocation). Nu console loggas det.
+ Va konsekventa med svenska/engelska?

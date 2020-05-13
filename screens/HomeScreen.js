@@ -27,13 +27,15 @@ export default class HomeScreen extends React.Component {
                   </Text> 
 
                   <Button onPress={() => 
-                    {console.log("This button is out of order. :( Please use 'find drink' längst ner i fönstret istället, sålänge liksom")
+                    {this.props.navigation.navigate('Find')
                     }}
                     title="STARTA">
                   </Button>
 
-                  <Text style={styles.helpLinkText}>
-                    <div>Eller <u>logga in</u> för att se dina sparade förslag</div>
+                  <Text style={styles.helpLinkText}
+                   onPress={() =>this.props.navigation.navigate('Links')}>
+                    {this.props.user === undefined? <div>Eller <u>logga in</u> för att se dina sparade förslag</div>:
+                    <u>Gå till din profil</u>}
                   </Text>
                   <Image source={require('../assets/images/frontpageimg.png')} style={styles.bottomImage}/>
 

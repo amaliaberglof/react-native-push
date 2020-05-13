@@ -6,6 +6,7 @@ import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
 import {getStoresInCity, getClosestStore, getStoreInventory} from '../apiFunctions'
+import GoogleMapReact from 'google-map-react';
 
 import 'firebase/auth';
 
@@ -34,18 +35,19 @@ export default class FindScreen extends React.Component {
             userLongitude: 0,
             userDrinks: [],
             currentDrink: undefined,
-            errMessage: undefined
+            errMessage: undefined,
+            storeCoords: undefined
           };
           this.getInventory = this.getInventory.bind(this);
           this.setPosition = this.setPosition.bind(this);
           this.getStore = this.getStore.bind(this);
           this.getLocation();
           this.getStores();
+          this.clicked();
       }
 
 
       clicked() {
-        document.getElementById("infotext").innerHTML = "A new suggestion? Ok, but...";
           if (typeof DeviceOrientationEvent.requestPermission === 'function') {
               DeviceOrientationEvent.requestPermission()
               .then(response => {
@@ -90,6 +92,7 @@ export default class FindScreen extends React.Component {
             console.log("Geolocation supported")
           navigator.geolocation.getCurrentPosition(this.setPosition);
         } else { 
+          // TODO: ändra så detta skrivs ut synligt för användaren, istället för i consolen
           console.log("Geolocation is not supported by this browser.");
         }
       }
@@ -114,6 +117,7 @@ export default class FindScreen extends React.Component {
           //console.log("lat, long: " + this.state.userLatitude + ", " + this.state.userLongitude)
           getClosestStore(this.state.userLatitude, this.state.userLongitude)
           .then(data=> this.setState({
+              storeCoords: {lat: parseFloat(data.items[index].lat), lng: parseFloat(data.items[index].lng)},
               closestStore: data.items[index].address,
               storeId: data.items[index].id
           }, () => this.getInventory(index))).catch(err => {
@@ -151,7 +155,7 @@ export default class FindScreen extends React.Component {
         // Future:
         //var neededDirection = Math.floor(Math.random() * 360);
         var neededDirection = 60;
-        document.getElementById("directionNeeded").innerHTML = "Your phone needs to be in direction: " + neededDirection;
+        document.getElementById("directionNeeded").innerHTML = neededDirection;
     
         var alpha   = event.alpha; //z axis rotation [0,360)
         var beta     = event.beta; //x axis rotation [-180, 180]
@@ -162,7 +166,8 @@ export default class FindScreen extends React.Component {
           alpha = event.webkitCompassHeading; //for iOS devices
           var heading = alpha
         }
-        document.getElementById("direction").innerHTML = "Your phone is currently in direction: " + Math.floor(alpha);
+        document.getElementById("direction").innerHTML =  Math.floor(alpha);
+
         if( Math.floor(alpha)==neededDirection){
           document.getElementById("success").innerHTML = "Success!";
           this.getSingleDrink();
@@ -196,29 +201,40 @@ export default class FindScreen extends React.Component {
                         <div>{this.state.closestStore}</div>
 
                     <h2>Here's a drink from that store:</h2>
-                        {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrinkName}</div>}
-                    
-                    <Button 
-                        title="Add this drink!" 
-                        onPress={() => {this.addDrink(this.state.currentDrink)}}
-                        disabled={this.props.user === undefined || this.state.currentDrink === undefined}
-                    
-                    />
-                    
-                 </Text>
-                 <Button 
-                          title="No! I want a new drink >:("
-                          onPress={() => {this.clicked()
-                          }}
-                          />
-                          <div id="infotext"></div>
-                          <div id="directionNeeded"></div>
-                          <div id ="direction"></div>
-                          <div id="success"></div>
-                 <Text>
-                    <h2>Here are your stored drinks:</h2>
-                        {this.state.userDrinks === undefined? undefined : this.state.userDrinks.map((drink, i) => <div key={i}>{drink.name}</div>)}
-                </Text>
+                    <View style={styles.suggestionRowItem}>
+
+                      {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrinkName}</div>}
+                      </View>
+                      <View style={styles.suggestionRowItem}>
+                        <Button title="SAVE"  onPress={() => {this.addDrink(this.state.currentDrink)}} disabled={this.props.user === undefined || this.state.currentDrink === undefined} />    
+                      </View>       
+                  
+                      </Text>
+                      <View style={styles.directions}>
+                        <Text>
+                        To get a new drink suggestion, please point your phone in direction: <u><div id="directionNeeded"></div></u>
+
+                        </Text>
+                        <View style={styles.innerDirections}>
+                          <Text>
+                          Your phone is currently in direction: <u><div id ="direction"></div></u>
+                          </Text>
+                        </View>
+                      </View>
+                      
+                      <div id="success"></div>
+
+                      {this.state.storeCoords === undefined? undefined : <div style={{ height: '100vh', width: '100%' }}>
+                          <GoogleMapReact
+                              //bootstrapURLKeys={{ key: /* YOUR KEY HERE */ }}
+                              defaultCenter={{
+                                  lat: this.state.storeCoords.lat,
+                                  lng: this.state.storeCoords.lng
+                              }}
+                              defaultZoom={20}
+                          >
+                          </GoogleMapReact>
+                      </div>}
             </View>
         </ScrollView>
         {this.state.errMessage !== undefined ? Alert.alert(
@@ -290,12 +306,9 @@ export default class FindScreen extends React.Component {
       paddingVertical: 20,
 
     },
-    mapImage: {
-      margin: 10,
-      flex: 1,
-      width: deviceWidth * 0.8,
-      height: deviceWidth * 0.8,
-      resizeMode: 'contain',
+    suggestionRowItem: {
+      float: 'left',
+      margin: '10px',
     },
     overlay: {
       display:'block',
@@ -314,7 +327,20 @@ export default class FindScreen extends React.Component {
     fontSize: '100px',
     textAlign: 'center',
     color: 'white',
-}
+},
+  directions: {
+    backgroundColor: '#C3E3FB',
+    borderRadius: '25px',
+    padding: '1em',
+    margin: '1em',
+  },
+  innerDirections: {
+    backgroundColor: '#82B2D7',
+    borderRadius: '25px',
+    padding: '0.3em',
+    margin: '0.3em',
+
+  }
 
   });
   

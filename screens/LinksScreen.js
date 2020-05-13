@@ -155,7 +155,18 @@ deleteDrink() {
             }}>
               
           <Text style={styles.userButtonText}>{this.state.buttonText}</Text>
-          </TouchableOpacity></View>:<View style={styles.Wrapper}>
+          </TouchableOpacity>
+
+          <View>
+          {this.state.signup ? <Text onPress={() => {this.setState({signup:false, login:true, buttonText:'Log in'})}}
+                                    style ={styles.signUpText}>Click here if you want to login instead</Text>:
+          <Text style={styles.signUpText}
+            onPress={() => {
+              this.setState({signup:true, login:false, buttonHide:true, buttonText:'Sign up'})
+            }}>Click here if you don't have an account</Text>}
+          </View>
+          
+          </View>:<View style={styles.Wrapper}>
 
           <TouchableOpacity
             style={styles.myButton} 
