@@ -36,7 +36,8 @@ export default class FindScreen extends React.Component {
             userDrinks: [],
             currentDrink: undefined,
             errMessage: undefined,
-            storeCoords: undefined
+            storeCoords: undefined,
+            neededDirection: 0
           };
           this.getInventory = this.getInventory.bind(this);
           this.setPosition = this.setPosition.bind(this);
@@ -48,6 +49,8 @@ export default class FindScreen extends React.Component {
 
 
       clicked() {
+          // Future:
+          this.setState({neededDirection: Math.floor(Math.random() * 360)});
           if (typeof DeviceOrientationEvent.requestPermission === 'function') {
               DeviceOrientationEvent.requestPermission()
               .then(response => {
@@ -143,7 +146,10 @@ export default class FindScreen extends React.Component {
           var singledrink = this.state.storeItems[Math.floor(Math.random() * (this.state.storeItems.length))]
           var singledrinkInfo = {...singledrink, location:this.state.closestStore}
           this.setState({currentDrink: singledrinkInfo, currentDrinkName: singledrinkInfo.name})
+          this.setState({neededDirection: Math.floor(Math.random() * 360)});
+
         }
+
       }
 
       componentDidMount() {
@@ -151,12 +157,9 @@ export default class FindScreen extends React.Component {
       }
   
       
-      deviceOrientationListener(event) {
-        // Future:
-        //var neededDirection = Math.floor(Math.random() * 360);
-        var neededDirection = 60;
-        document.getElementById("directionNeeded").innerHTML = neededDirection;
-    
+      deviceOrientationListener(event) { 
+        document.getElementById("errorMessage").innerHTML = "";
+
         var alpha   = event.alpha; //z axis rotation [0,360)
         var beta     = event.beta; //x axis rotation [-180, 180]
         var gamma   = event.gamma; //y axis rotation [-90, 90]
@@ -166,10 +169,13 @@ export default class FindScreen extends React.Component {
           alpha = event.webkitCompassHeading; //for iOS devices
           var heading = alpha
         }
-        document.getElementById("direction").innerHTML =  Math.floor(alpha);
 
-        if( Math.floor(alpha)==neededDirection){
-          document.getElementById("success").innerHTML = "Success!";
+        document.getElementById("direction").innerHTML =  "Your phone is currently in direction: " + Math.floor(alpha) + "°";
+        document.getElementById("directionNeeded").innerHTML = "To get a new drink suggestion, please point your phone in direction: " + this.state.neededDirection + "°";
+    
+
+
+        if( Math.floor(alpha)==this.state.neededDirection){
           this.getSingleDrink();
         }
       }
@@ -184,20 +190,21 @@ export default class FindScreen extends React.Component {
             </Text>
 
             <View style={styles.infoContainer}>
-            {/* <Button 
-            title="FIND CLOSEST"
-            onPress={() => {this.getLocation()
-            }}
-            /> */}
-
-
-            <div id="position"></div>
+            {this.state.storeCoords === undefined? undefined : <div style={{ height: '30vh', width: '100%', margin: ''}}>
+                          <GoogleMapReact
+                              //bootstrapURLKeys={{ key: /* YOUR KEY HERE */ }}
+                              defaultCenter={{
+                                  lat: this.state.storeCoords.lat,
+                                  lng: this.state.storeCoords.lng
+                              }}
+                              defaultZoom={16}
+                          >
+                          </GoogleMapReact>
+             </div>}
                 
                 <Text style={styles.infoText}>
-                    {/* <h2>Here's some stores in Stockholm</h2>
-                        {slice.map((store, i) => <div key={i}>{store.address}</div>)} */}
 
-                    <h2>This is your closest store: (With an invetory)</h2>
+                    <h2>This is your closest store: (With an inventory)</h2>
                         <div>{this.state.closestStore}</div>
 
                     <h2>Here's a drink from that store:</h2>
@@ -206,35 +213,28 @@ export default class FindScreen extends React.Component {
                       {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrinkName}</div>}
                       </View>
                       <View style={styles.suggestionRowItem}>
-                        <Button title="SAVE"  onPress={() => {this.addDrink(this.state.currentDrink)}} disabled={this.props.user === undefined || this.state.currentDrink === undefined} />    
-                      </View>       
+                        <Button title="SAVE"  onPress={() => {this.addDrink(this.state.currentDrink), document.getElementById("confirmMessage").innerHTML = this.state.currentDrinkName +  " added!";
+                                          }} disabled={this.props.user === undefined || this.state.currentDrink === undefined} />
+                                              
+                      </View>
+                      <div id="confirmMessage" style={{color: 'grey', fontStyle: 'italic'}}></div>     
                   
                       </Text>
                       <View style={styles.directions}>
+                      <h2 style={{fontFamily: 'Helvetica, arial, sans-serif'}}>Get a new suggestion:</h2>
+
+                        <div id="errorMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>No device orientation found :( You need device orientation to get a new suggestions.</div>
                         <Text>
-                        To get a new drink suggestion, please point your phone in direction: <u><div id="directionNeeded"></div></u>
+                        <div id="directionNeeded" style={{fontFamily: 'Helvetica, arial, sans-serif'}}></div>
 
                         </Text>
                         <View style={styles.innerDirections}>
                           <Text>
-                          Your phone is currently in direction: <u><div id ="direction"></div></u>
+                            <div id ="direction" style={{fontFamily: 'Helvetica, arial, sans-serif'}}></div>
                           </Text>
                         </View>
                       </View>
-                      
-                      <div id="success"></div>
 
-                      {this.state.storeCoords === undefined? undefined : <div style={{ height: '100vh', width: '100%' }}>
-                          <GoogleMapReact
-                              //bootstrapURLKeys={{ key: /* YOUR KEY HERE */ }}
-                              defaultCenter={{
-                                  lat: this.state.storeCoords.lat,
-                                  lng: this.state.storeCoords.lng
-                              }}
-                              defaultZoom={20}
-                          >
-                          </GoogleMapReact>
-                      </div>}
             </View>
         </ScrollView>
         {this.state.errMessage !== undefined ? Alert.alert(
@@ -307,7 +307,7 @@ export default class FindScreen extends React.Component {
 
     },
     suggestionRowItem: {
-      float: 'left',
+      // float: 'left',
       margin: '10px',
     },
     overlay: {
@@ -337,10 +337,11 @@ export default class FindScreen extends React.Component {
   innerDirections: {
     backgroundColor: '#82B2D7',
     borderRadius: '25px',
-    padding: '0.3em',
+    padding: '0.8em',
     margin: '0.3em',
 
   }
+
 
   });
   
