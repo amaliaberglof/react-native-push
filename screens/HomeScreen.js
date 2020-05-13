@@ -17,14 +17,12 @@ export default class HomeScreen extends React.Component {
                   
                   <Text style={styles.infoText}>Don't know what to drink? No worries! We will find your closest <i>Systembolag</i> and suggest a delicious beverage available there. </Text>
 
-
                   <Button onPress={() => 
                     {this.props.navigation.navigate('Find')
                     }}
                     title="FIND ME A DRINK">
                   </Button>
               </View>
-
             </ScrollView>
            <Image source={require('../assets/images/frontpageimg.png')} style={styles.bottomImage}/>
 

@@ -79,21 +79,6 @@ export default class FindScreen extends React.Component {
       }
       
 
-      getUserDrinks(){
-        if (this.props.user !== undefined) {
-          //Lay connection with the database.
-          var drinks = []
-          var firestore = firebase.firestore();
-          var coll = firestore.collection("users").doc(this.props.user)
-          coll.get().then(doc => {
-            if (doc.data().drinks !== undefined){
-                doc.data().drinks.forEach(drink => drinks.push(drink))
-                this.setState({userDrinks: drinks})
-            }
-          })
-        }   
-    }
-
         addDrink(drink){
             this.setState({userDrinks: [...this.state.userDrinks, drink]})
 
@@ -191,10 +176,6 @@ export default class FindScreen extends React.Component {
           this.setState({done:true})
         }
 
-      }
-
-      componentDidMount() {
-        this.getUserDrinks();
       }
   
       
@@ -300,7 +281,6 @@ export default class FindScreen extends React.Component {
         )
     }
   }
-
 
   const styles = StyleSheet.create({
     container: {
