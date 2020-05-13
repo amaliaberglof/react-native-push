@@ -227,11 +227,10 @@ export default class FindScreen extends React.Component {
         <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
             <Text style={styles.headerText}>
-                Find closest Systembolag
+                Find closest
             </Text>
 
             <View style={styles.infoContainer}>
-
             <div id="position"></div>
             <div id="sorryMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>We're sorry! We can't find your location. We'll randomize a store for you!</div>
             <div style={{ height: '30vh', width: '100%', margin: ''}}>
