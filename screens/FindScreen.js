@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Button, Image, Platform, Dimensions, componentDidMount } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, Platform, Dimensions, componentDidMount, Alert } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import * as firebase from 'firebase/app';
@@ -33,7 +33,8 @@ export default class FindScreen extends React.Component {
             userLatitude: 0,
             userLongitude: 0,
             userDrinks: [],
-            currentDrink: undefined
+            currentDrink: undefined,
+            errMessage: undefined
           };
           this.getInventory = this.getInventory.bind(this);
           this.setPosition = this.setPosition.bind(this);
@@ -60,13 +61,12 @@ export default class FindScreen extends React.Component {
       
 
       getUserDrinks(){
-        if (this.state.user !== undefined) {
+        if (this.props.user !== undefined) {
           //Lay connection with the database.
           var drinks = []
           var firestore = firebase.firestore();
-          var coll = firestore.collection("users").doc(this.state.user)
+          var coll = firestore.collection("users").doc(this.props.user)
           coll.get().then(doc => {
-            console.log(doc.data())
             if (doc.data().drinks !== undefined){
                 doc.data().drinks.forEach(drink => drinks.push(drink))
                 this.setState({userDrinks: drinks})
@@ -79,7 +79,7 @@ export default class FindScreen extends React.Component {
             this.setState({userDrinks: [...this.state.userDrinks, drink]})
 
             var firestore = firebase.firestore();
-            var drinksRef = firestore.collection("users").doc(this.state.user);
+            var drinksRef = firestore.collection("users").doc(this.props.user);
             var setWithMerge = drinksRef.set({
                 drinks: [...this.state.userDrinks, drink]
             }, { merge: true });
@@ -104,7 +104,10 @@ export default class FindScreen extends React.Component {
       }
   
       getStores(){
-          getStoresInCity('stockholm').then(data=> this.setState({stores: data.items}))
+          getStoresInCity('stockholm').then(data=> this.setState({stores: data.items})).catch(err => {
+            console.log(err)
+            this.setState({errMessage: 'There was an error with the API :( Try again!'})
+          })
       }
   
       getStore(index){
@@ -113,40 +116,36 @@ export default class FindScreen extends React.Component {
           .then(data=> this.setState({
               closestStore: data.items[index].address,
               storeId: data.items[index].id
-          }, () => this.getInventory(index)))
+          }, () => this.getInventory(index))).catch(err => {
+            console.log(err)
+            this.setState({errMessage: 'There was an error with the API :( Try again!'})
+          })
       }
   
       getInventory(index){
           getStoreInventory(this.state.storeId).then(data => 
-              (data != undefined) ? (this.setState({storeItems: data.items}), this.getSingleDrink()) :
+              (data != undefined) ? (this.setState({storeItems: data.items}), this.getSingleDrink())
+               :
               this.getStore(index + 1)
               )   //if the store inventory is undefined, take the next store
-
+              .catch(err => {
+                console.log(err)
+                this.setState({errMessage: 'There was an error with the API :( Try again!'})
+              })
       }
 
       getSingleDrink() {
         if(this.state.storeItems.length > 0) {
-          console.log(this.state.storeItems)
           var singledrink = this.state.storeItems[Math.floor(Math.random() * (this.state.storeItems.length))]
           var singledrinkInfo = {...singledrink, location:this.state.closestStore}
           this.setState({currentDrink: singledrinkInfo, currentDrinkName: singledrinkInfo.name})
         }
       }
 
-      handleStateChange = (user) => {
-        if(user) {
-          this.setState({user:user.uid})
-          this.getUserDrinks();
-        }
-        else {
-          console.log("Not logged in")
-        }
-    
-      }
-    
       componentDidMount() {
-        firebase.auth().onAuthStateChanged(this.handleStateChange);
+        this.getUserDrinks();
       }
+  
       
       deviceOrientationListener(event) {
         // Future:
@@ -172,7 +171,6 @@ export default class FindScreen extends React.Component {
 
     render(){
         let slice = this.state.stores.slice(0, 5);
-
         return (
         <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
@@ -203,7 +201,7 @@ export default class FindScreen extends React.Component {
                     <Button 
                         title="Add this drink!" 
                         onPress={() => {this.addDrink(this.state.currentDrink)}}
-                        disabled={this.state.user === undefined}
+                        disabled={this.props.user === undefined || this.state.currentDrink === undefined}
                     
                     />
                     
@@ -223,6 +221,9 @@ export default class FindScreen extends React.Component {
                 </Text>
             </View>
         </ScrollView>
+        {this.state.errMessage !== undefined ? Alert.alert(
+          "Oops", this.state.errMessage, { cancelable: false }
+        ):<div></div>}
         </View>
         
         )
