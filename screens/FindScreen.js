@@ -227,7 +227,7 @@ export default class FindScreen extends React.Component {
         <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
             <Text style={styles.headerText}>
-                Find closest
+                Find closest Systembolag
             </Text>
 
             <View style={styles.infoContainer}>
