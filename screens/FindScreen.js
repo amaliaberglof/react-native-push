@@ -37,7 +37,7 @@ export default class FindScreen extends React.Component {
             currentDrink: undefined,
             errMessage: undefined,
             storeCoords: undefined,
-            neededDirection: 0
+            neededDirection: 0,
           };
           this.getRandomStore = this.getRandomStore.bind(this)
           this.getRandomInventory = this.getRandomInventory.bind(this)
@@ -176,7 +176,6 @@ export default class FindScreen extends React.Component {
           var singledrinkInfo = {...singledrink, location:this.state.closestStore}
           this.setState({currentDrink: singledrinkInfo, currentDrinkName: singledrinkInfo.name})
           this.setState({neededDirection: Math.floor(Math.random() * 360)});
-
         }
 
       }
