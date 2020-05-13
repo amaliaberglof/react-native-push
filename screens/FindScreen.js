@@ -259,13 +259,14 @@ export default class FindScreen extends React.Component {
                           </GoogleMapReact>
                 :<div></div>}
                 </div>
-                
+                {this.state.done ? <View style={{display:`${this.state.done}`, backgroundColor: '#C3E3FB', borderRadius: '25px', padding: '1em',margin: '1em', marginBottom: 0, marginTop: '0.5em'}}>
                 <Text style={styles.infoText}>
 
-                  {this.state.done ?<h2>This is your closest store: (With an inventory)</h2> :undefined }
-                        <div>{this.state.closestStore}</div>
+                
 
-                    {this.state.done ? <h2>Here's a drink from that store:</h2>:<div></div>}
+                    {this.state.done ?<Text><Text style={styles.drinkText}>This is your closest store (with an inventory):</Text> {this.state.closestStore}</Text> :undefined }
+
+                    {this.state.done ? <Text style={styles.drinkText, {display:'block'}}><b>Here's what we found for you!</b></Text>:<div></div>}
                     <View style={styles.suggestionRowItem}>
 
                       {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrinkName}</div>}
@@ -278,10 +279,12 @@ export default class FindScreen extends React.Component {
                       <div id="confirmMessage" style={{color: 'grey', fontStyle: 'italic'}}></div>     
                   
                       </Text>
+                      </View>:undefined}
                       <View style={styles.directions}>
-                      <h2 style={{fontFamily: 'Helvetica, arial, sans-serif'}}>Get a new suggestion:</h2>
+                      <Text style={{fontFamily: 'Helvetica, arial, sans-serif', fontSize: 20, fontWeight:'bold'}}
+                      onPress={() => this.getSingleDrink()}>Get a new suggestion</Text>
 
-                        <div id="errorMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>No device orientation found :( You need device orientation to get a new suggestions.</div>
+                        <div id="errorMessage" style={{color: 'red', fontFamily: 'Helvetica, arial, sans-serif'}}>No device orientation found :( You need device orientation to get a new suggestion. Click the title above instead!</div>
                         <Text>
                         <div id="directionNeeded" style={{fontFamily: 'Helvetica, arial, sans-serif'}}></div>
 
@@ -292,7 +295,6 @@ export default class FindScreen extends React.Component {
                           </Text>
                         </View>
                       </View>
-
             </View>
         </ScrollView>
         {this.state.errMessage !== undefined ? Alert.alert(
@@ -366,7 +368,7 @@ export default class FindScreen extends React.Component {
     },
     suggestionRowItem: {
       // float: 'left',
-      margin: '10px',
+      margin: '5px',
     },
     overlay: {
       display:'block',
@@ -398,6 +400,10 @@ export default class FindScreen extends React.Component {
     padding: '0.8em',
     margin: '0.3em',
 
+  },
+  drinkText: {
+    fontSize:'15px',
+    fontWeight: 'bold'
   }
 
 
