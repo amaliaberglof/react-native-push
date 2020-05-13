@@ -193,8 +193,8 @@ deleteDrink() {
                   Begin by browsing the Find drink-tab.</Text>
                   :
                   <Text style={styles.infoText}>Here are the drinks you have saved. 
-                  <br/>Click on the beer-icon to get more information 
-                  <br/>about the drink. Long-hold to be able to delete.</Text> }
+                  <br/>Tap on the beer-icon to get more information 
+                  <br/>about the drink. Tap the drink to be able to delete.</Text> }
                   {this.state.userDrinks === undefined? <div></div> 
                   : this.state.userDrinks.map((drink,index) => (
                     <div key={index}>
