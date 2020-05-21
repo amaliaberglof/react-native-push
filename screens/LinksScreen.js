@@ -61,9 +61,21 @@ export default class LinksScreen extends React.Component {
       var coll = firestore.collection("users").doc(this.props.user)
       coll.get().then(doc => {
         if(doc.exists) {
+          var unique = []
           if (doc.data().drinks !== undefined){
             doc.data().drinks.forEach(drink => drinks.push(drink))
-            this.setState({userDrinks: drinks})
+            drinks.forEach(drink => {
+              var exist = false
+              unique.forEach(uniquedrink => {
+                if(drink.name === uniquedrink.name) {
+                  exist = true
+                }
+              })
+              if (!exist) {
+                unique.push(drink)
+              }
+            })
+            this.setState({userDrinks: unique})
         }
         }
       })

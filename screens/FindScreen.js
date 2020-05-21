@@ -50,6 +50,7 @@ export default class FindScreen extends React.Component {
             storeCoords: undefined,
             neededDirection: 0,
             done:false,
+            modalShow:false
           };
           this.getRandomStore = this.getRandomStore.bind(this)
           this.getRandomInventory = this.getRandomInventory.bind(this)
@@ -80,13 +81,26 @@ export default class FindScreen extends React.Component {
       
 
         addDrink(drink){
-            this.setState({userDrinks: [...this.state.userDrinks, drink]})
-
+          if (this.props.user !== undefined) {
+            //Lay connection with the database.
+            var drinks = []
             var firestore = firebase.firestore();
-            var drinksRef = firestore.collection("users").doc(this.props.user);
-            var setWithMerge = drinksRef.set({
-                drinks: [...this.state.userDrinks, drink]
-            }, { merge: true });
+            var coll = firestore.collection("users").doc(this.props.user)
+            coll.get().then(doc => {
+              if(doc.exists) {
+                if (doc.data().drinks !== undefined){
+                  doc.data().drinks.forEach(drink => drinks.push(drink))
+                  this.setState({userDrinks: drinks})
+              }
+              }
+            }).then(() => {
+              this.setState({userDrinks: [...this.state.userDrinks, drink]})
+              var db = firebase.firestore();
+              db.collection("users").doc(this.props.user).set({
+                drinks: [...this.state.userDrinks]
+              }, {merge: true}).then(() => console.log("Success")).catch(err => console.log(err))
+            })
+          }
         }
   
       getLocation() {
@@ -203,6 +217,7 @@ export default class FindScreen extends React.Component {
       }
 
     render(){
+      console.log(this.state.modalShow)
         let slice = this.state.stores.slice(0, 5);
         return (
         <View style={styles.container}>
@@ -245,11 +260,13 @@ export default class FindScreen extends React.Component {
                     {this.state.done ? <Text style={styles.drinkText, {display:'block'}}><b>Here's what we found for you!</b></Text>:<div></div>}
                     <View style={styles.suggestionRowItem}>
 
-                      {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrinkName}</div>}
-                      </View>
-                      <View style={styles.suggestionRowItem}>
-                        {this.state.done ?<Button title="SAVE"  onPress={() => {this.addDrink(this.state.currentDrink), document.getElementById("confirmMessage").innerHTML = this.state.currentDrinkName +  " added!";
+                      {(this.state.storeItems.length <= 0) ? <div></div> : <div>{this.state.currentDrinkName}<span>  </span>
+                      {this.state.done ? <Button title ="View more..." onPress={() => this.setState({modalShow:true})}
+                                            />:undefined}
+                                            <span>  </span>
+                                          {this.state.done ?<Button title="SAVE"  onPress={() => {this.addDrink(this.state.currentDrink), document.getElementById("confirmMessage").innerHTML = this.state.currentDrinkName +  " added!";
                                           }} disabled={this.props.user === undefined || this.state.currentDrink === undefined} />:undefined}
+                                          </div>}
                                               
                       </View>
                       <div id="confirmMessage" style={{color: 'grey', fontStyle: 'italic'}}></div>     
@@ -272,6 +289,33 @@ export default class FindScreen extends React.Component {
                         </View>
                       </View>
             </View>
+            {this.state.modalShow ?
+            
+            // The pop-up window for the drink
+            <View 
+            onTouchEndCapture
+            ={() => this.setState({modalShow:false})}
+            style={styles.modal}>
+              <View style={styles.modalContent}>
+                <View style={styles.closeModal}>
+                  <Text
+                  onPress={() => this.setState({modalShow:false})}
+                  style={styles.closeModalText}>X</Text></View>
+              
+              {/* Content */}
+              <Image source={require('../assets/images/beer.png')} style={styles.beerLogo}/>
+              <Text style={styles.drinkHeader}>{this.state.currentDrink.name}</Text>
+              <View style={styles.drinkInfo}>
+                <Text style={styles.boldText}>Found at {this.state.currentDrink.location}</Text>
+                
+                {this.state.currentDrink.items < 15 ? <Text>This item is almost out of stock!<br/><br/></Text>:<Text style={styles.centerText}>You don't need to rush - there's a lot of this drink at the store<br/><br/></Text>}
+                
+                <Text>Cost: {this.state.currentDrink.price} SEK | Alc.: {this.state.currentDrink.alcohol_vol}% | APK: {(this.state.currentDrink.alcohol_vol/this.state.currentDrink.price).toFixed(2)} <br/><br/></Text>
+                <Text style={styles.centerText}>Country: {this.state.currentDrink.country} | Producer: {this.state.currentDrink.producer}<br/><br/></Text>
+                
+              </View>
+              </View>
+            </View> :<div></div>}
         </ScrollView>
         {this.state.errMessage !== undefined ? Alert.alert(
           "Oops", this.state.errMessage, { cancelable: false }
@@ -291,11 +335,11 @@ export default class FindScreen extends React.Component {
       paddingTop: 0,
     },
     headerText: {
-      fontSize: 40,
+      fontSize: 30,
       color: 'rgba(96,100,109, 1)',
       textAlign: 'center',
       fontWeight: 'bold',
-      paddingTop: '0.4em',
+      paddingTop: '0.2em',
     },
     infoContainer: {
       position: 'relative',
@@ -320,8 +364,8 @@ export default class FindScreen extends React.Component {
 
     },
     suggestionRowItem: {
-      // float: 'left',
-      margin: '5px',
+      display: 'block',
+      marginTop: 5,
     },
     overlay: {
       display:'block',
@@ -346,6 +390,7 @@ export default class FindScreen extends React.Component {
     borderRadius: '25px',
     padding: '1em',
     margin: '1em',
+    marginTop: '0.5em',
   },
   innerDirections: {
     backgroundColor: '#82B2D7',
@@ -357,8 +402,63 @@ export default class FindScreen extends React.Component {
   drinkText: {
     fontSize:'15px',
     fontWeight: 'bold'
-  }
+  },
+  beerLogo: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
+    margin: 'auto'
+  },
 
+  modal: {
+    display: 'block',
+    position: 'fixed', /* Stay in place */
+    zIndex: 1, /* Sit on top */
+    paddingTop: 30, /* Location of the box */
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: '100%', /* Full width */
+    height: '100%', /* Full height */
+    overflow: 'auto', /* Enable scroll if needed */
+    backgroundColor: 'rgb(0,0,0)', /* Fallback color */
+    backgroundColor: 'rgba(0,0,0,0.4)', /* Black w/ opacity */
+  },
+  modalContent: {
+    borderRadius:10,
+    backgroundColor: '#fefefe',
+    margin: 'auto',
+    padding: 10,
+    width: '80%',
+    height:'80%'
+  },
+  drinkHeader: {
+    paddingTop:25,
+    fontSize: 25,
+    textAlign: 'center',
+  },
+  closeModal: {
+    width:25,
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    display:'block',
+    backgroundColor: 'grey',
+    padding:7,
+    paddingLeft:8,
+    borderRadius:10,
+  },
+  closeModalText: {
+    textAlign: 'center',
+  },
+  drinkInfo: {
+    marginTop:10,
+    alignContent: 'center',
+    alignItems: 'center',
+  },
+  boldText:{
+    fontWeight: 'bold'
+  },
 
   });
   
